@@ -1,0 +1,96 @@
+name: Docker Build Workflow
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        type: string
+        required: true
+      RUNNER_LABEL:
+        type: string
+        required: true
+      FETCH_SSM_PARAMETER:
+        type: boolean
+        required: true
+        default: false
+      SSM_APP_SETTINGS_PATH:
+        type: string
+        required: true
+      DOCKER_FILE_PATH:
+        type: string
+        required: true
+      CHECKOUT_SUBMODULE:
+        type: string
+        required: false
+        default: "false"
+      USE_GITHUB_APP:
+        type: boolean
+        required: false
+        default: false
+    outputs:
+      commit_id:
+        description: 'Short commit SHA'
+        value: ${{ jobs.docker_build_push.outputs.commit_id }}
+        
+jobs:
+  docker_build_push:
+    name: Docker Build and Push
+    environment: ${{ inputs.ENVIRONMENT }}
+    runs-on: ${{ inputs.RUNNER_LABEL }}
+    outputs:
+      commit_id: ${{ steps.extract_commit.outputs.commit_id }}
+    steps:
+    - name: Generate Github Token
+      if: ${{ inputs.USE_GITHUB_APP != false }}
+      uses: actions/create-github-app-token@v1
+      id: app-token
+      with:
+        app-id: ${{ vars.APP_ID }}
+        private-key: ${{ secrets.PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ steps.app-token.outputs.token != '' && steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        submodules: ${{ inputs.CHECKOUT_SUBMODULE == 'true' && 'recursive' || 'false' }}
+    - name: Configure AWS Creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+        role-session-name: GithubActionsRole
+        aws-region: ${{ vars.AWS_REGION }}
+    - name: Fetch SSM Parameter
+      if: ${{ inputs.FETCH_SSM_PARAMETER != false }}
+      run: aws ssm get-parameter --name  "${{ vars.SSM_PARAMETER_NAME }}" --with-decryption --output text  --query "Parameter.Value" > ${{ inputs.SSM_APP_SETTINGS_PATH }}
+    - name: Extract short commit id
+      id: extract_commit
+      run: echo "commit_id=$(echo ${GITHUB_SHA} | cut -c 1-7)" >> $GITHUB_OUTPUT
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Setup Docker buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Build and push Docker image
+      id: build-and-push
+      uses: docker/build-push-action@v6
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: ${{ vars.ECR_REPO_NAME }}
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
+      with:
+        context: ${{ inputs.DOCKER_FILE_PATH }}
+        platforms: ${{ vars.BUILD_PLATFORMS }}
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.extract_commit.outputs.commit_id }}
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest
+        build-args: |
+          AWS_ACCOUNT=${{ secrets.ACCOUNT_ID }}
+          AWS_REGION=${{ vars.AWS_REGION }}
+          AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}
+          BUILD_IMAGE_TAG=${{ vars.BUILD_IMAGE_TAG }}
+          APP_IMAGE_TAG=${{ vars.APP_IMAGE_TAG }}
+          ${{ vars.DOCKER_BUILD_EXTRA_ARGS }}
+        provenance: false
+        push: true

@@ -1,0 +1,33 @@
+name: Kubernetes Token Rotation
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+
+jobs:
+  k8s_token:
+      name: K8s Rotate Token for ${{ matrix.environment }}
+      environment: ${{ matrix.environment }}
+      runs-on: "${{ matrix.environment == 'Batched-Development' && 'batched-dev-runner' || matrix.environment == 'Batched-Production' && 'batched-prod-runner' || 'default-runner' }}"
+      strategy:
+        fail-fast: false
+        matrix:
+          environment: ["Batched-Development","Batched-Production"]
+
+      steps:
+      - name: Configure AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+          role-session-name: GithubActionsRole
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: KubeConfig
+        run: aws sts get-caller-identity && aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name ${{ vars.CLUSTER_NAME }}
+      - name: Rotate Token
+        run: |
+          aws ssm put-parameter --name "K8S-Dashboard-View-Access" --value "$(kubectl create token kube-ds-viewer -n kube-system --duration=86400s)" --type "SecureString" --overwrite --region ${{ vars.AWS_REGION }}
+          aws ssm put-parameter --name "K8S-Dashboard-Edit-Access" --value "$(kubectl create token kube-ds-editor -n kube-system --duration=86400s)" --type "SecureString" --overwrite --region ${{ vars.AWS_REGION }}
+          aws ssm put-parameter --name "K8S-Dashboard-Admin-Access" --value "$(kubectl create token kube-ds-admin -n kube-system --duration=86400s)" --type "SecureString" --overwrite --region ${{ vars.AWS_REGION }}

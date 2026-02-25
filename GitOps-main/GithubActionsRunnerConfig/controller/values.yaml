@@ -1,0 +1,7 @@
+nodeSelector:
+  karpenter.sh/nodepool: ondemand-nodepool
+
+tolerations:
+  - key: "karpenter.sh/nodepool"
+    operator: "Exists"
+    effect: "NoExecute"

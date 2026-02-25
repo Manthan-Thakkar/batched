@@ -1,0 +1,79 @@
+name: Build & Push Generic Docker Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_to_environment:
+        type: choice
+        description: choose on which environment want to deploy
+        options:
+        - Batched-Development
+        - Batched-Production
+        - LabelTraxx
+      select_image:
+        description: 'Select Docker Image to Upgrade'
+        type: choice
+        options:
+        - dotnet8-aspnet
+        - dotnet8-sdk
+        - r-script
+      image_tag:
+        description: 'Docker Image Tag from Microsoft Official Image'
+        required: true
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  docker_build_push:
+    name: Docker Build and Push ${{ inputs.select_image }}:${{ inputs.image_tag }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.deploy_to_environment }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Configure AWS Creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+        role-session-name: GithubActionsRole
+        aws-region: ${{ vars.AWS_REGION }}
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Setup Docker buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Build and push Docker image
+      id: build-and-push
+      uses: docker/build-push-action@v6
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: "${{ inputs.select_image == 'dotnet8-aspnet' && 'dotnet/aspnet' || inputs.select_image == 'dotnet8-sdk' && 'dotnet/sdk' || inputs.select_image == 'r-script' && 'r-script-base' }}"
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
+      with:
+        context: ./GenericDockerImages/
+        file: ./GenericDockerImages/${{ inputs.select_image }}.Dockerfile
+        platforms: ${{ inputs.select_image == 'r-script' && 'linux/amd64' || vars.BUILD_PLATFORMS }}
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ inputs.image_tag }}
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest
+        build-args: |
+          IMAGE_TAG=${{ inputs.image_tag }}
+          ${{ vars.DOCKER_BUILD_EXTRA_ARGS }}
+        push: true
+        load: false
+    # - name: Scan built image with Inspector
+    #   uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
+    #   id: inspector-container-scan
+    #   env:
+    #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #     REPOSITORY: "${{ inputs.select_image == 'dotnet8-aspnet' && 'dotnet/aspnet' || inputs.select_image == 'dotnet8-sdk' && 'dotnet/sdk' || inputs.select_image == 'r-script' && 'r-script-base' }}"
+    #   with:
+    #     display_vulnerability_findings: "enabled"
+    #     artifact_type: 'container'
+    #     artifact_path: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest'
+    #     platform: 'linux/amd64'
+    #     critical_threshold: 1
+    #     high_threshold: 2

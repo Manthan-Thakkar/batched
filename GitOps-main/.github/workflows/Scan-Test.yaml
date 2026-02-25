@@ -1,0 +1,135 @@
+name: Scanner Workflow
+on:
+  workflow_call:
+    inputs:
+      SCAN_TYPE:
+        type: string
+        required: true
+        default: DOCKER
+      WORK_DIR:
+        type: string
+        required: false
+        default: .
+      CHECKOUT_SUBMODULE:
+        type: string
+        required: false
+        default: "false"
+      USE_GITHUB_APP:
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  aws_inspector_analysis:
+    name: AWS Inspector Analysis
+    environment: Test
+    runs-on: default-runner
+    steps:
+    - name: Generate Github Token
+      if: ${{ inputs.USE_GITHUB_APP != false }}
+      uses: actions/create-github-app-token@v1
+      id: app-token
+      with:
+        app-id: ${{ vars.APP_ID }}
+        private-key: ${{ secrets.PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ steps.app-token.outputs.token != '' && steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        submodules: ${{ inputs.CHECKOUT_SUBMODULE == 'true' && 'recursive' || 'false' }}
+    - name: Configure AWS Creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+        role-session-name: GithubActionsRole
+        aws-region: ${{ vars.AWS_REGION }}
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Build and push Docker image
+      if: ${{ inputs.SCAN_TYPE == 'DOCKER' }}
+      id: build-and-push
+      uses: docker/build-push-action@v6
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: test
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
+      with:
+        context: ${{ inputs.WORK_DIR }}
+        platforms: ${{ vars.BUILD_PLATFORMS }}
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest
+        build-args: |
+          AWS_ACCOUNT=${{ secrets.ACCOUNT_ID }}
+          AWS_REGION=${{ vars.AWS_REGION }}
+          AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}
+          BUILD_IMAGE_TAG=${{ vars.BUILD_IMAGE_TAG }}
+          APP_IMAGE_TAG=${{ vars.APP_IMAGE_TAG }}
+          ${{ vars.DOCKER_BUILD_EXTRA_ARGS }}
+        push: false
+    - name: Scan built image with Inspector
+      if: ${{ inputs.SCAN_TYPE == 'DOCKER' }}
+      uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
+      id: inspector-container-scan
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: test
+      with:
+        display_vulnerability_findings: "enabled"
+        artifact_type: 'container'
+        artifact_path: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest'
+        platform: 'linux/amd64'
+        critical_threshold: ${{ vars.CRITICAL_THRESHOLD }}
+        high_threshold: ${{ vars.HIGH_THRESHOLD }}
+    - name: Scan built image with Inspector
+      if: ${{ inputs.SCAN_TYPE == 'REPOSITORY' }}
+      uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
+      id: inspector-repository-scan
+      with:
+        display_vulnerability_findings: "enabled"
+        artifact_type: 'repository'
+        artifact_path: '${{ inputs.WORK_DIR }}'
+        critical_threshold: ${{ vars.critical_threshold }}
+        high_threshold: ${{ vars.high_threshold }}
+
+    - name: Display Inspector vulnerability scan results (markdown)
+      if: ${{ inputs.SCAN_TYPE == 'DOCKER' }}
+      run: cat ${{ steps.inspector-container-scan.outputs.inspector_scan_results_markdown }}
+
+    - name: Fail job if vulnerability threshold is exceeded
+      if: ${{ inputs.SCAN_TYPE == 'DOCKER' }}
+      run: exit ${{ steps.inspector-container-scan.outputs.vulnerability_threshold_exceeded }}
+    - name: Display Inspector vulnerability scan results (markdown)
+      if: ${{ inputs.SCAN_TYPE == 'REPOSITORY' }}
+      run: cat ${{ steps.inspector-repository-scan.outputs.inspector_scan_results_markdown }}
+
+    - name: Fail job if vulnerability threshold is exceeded
+      if: ${{ inputs.SCAN_TYPE == 'REPOSITORY' }}
+      run: exit ${{ steps.inspector-repository-scan.outputs.vulnerability_threshold_exceeded }}
+  # sonarqube_analysis:
+    # if: ${{ github.event_name == 'pull_request' }}
+    # name: SonarQube Analysis
+    # environment: Test
+    # runs-on: default-runner
+    # steps:
+    # - name: Checkout code
+    #   uses: actions/checkout@v4
+    # - name: Configure AWS Creds
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+    #     role-session-name: GithubActionsRole
+    #     aws-region: ${{ vars.AWS_REGION }}
+    # - name: Code Artifact Login
+    #   run: aws codeartifact login --tool dotnet --domain batched --repository nuget-repo
+    # - name: SonarQube Scan
+    #   run: |
+    #     export PATH="$HOME/.dotnet/tools:$PATH"
+    #     dotnet sonarscanner begin /k:"${{ vars.PROJECT_KEY }}" /d:sonar.login="${{ secrets.SONAR_TOKEN }}"  /d:sonar.host.url="${{ vars.SONAR_HOST_URL }}"
+    #     dotnet build
+    #     dotnet test --no-build --logger trx --collect:"XPlat Code Coverage"
+    #     dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

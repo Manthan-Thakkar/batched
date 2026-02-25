@@ -1,0 +1,112 @@
+name: Build & Deployed Serverless
+
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        description: 'Environment to deploy to (e.g., production, staging)'
+        required: true
+        type: string
+      FETCH_SSM_PARAMETER:
+        type: boolean
+        required: true
+        default: false
+      SSM_APP_SETTINGS_PATH:
+        type: string
+        required: true
+      CHECKOUT_SUBMODULE:
+        type: string
+        required: false
+        default: "false"
+      USE_GITHUB_APP:
+        type: boolean
+        required: false
+        default: false
+      WORK_DIR:
+        type: string
+        required: false
+        default: .
+
+jobs:
+  deploy_serverless:
+    name: Deploy Serverless Function
+    runs-on: default-runner
+    environment: ${{ inputs.ENVIRONMENT }}
+
+    steps:
+    - name: Generate Github Token
+      if: ${{ inputs.USE_GITHUB_APP != false }}
+      uses: actions/create-github-app-token@v1
+      id: app-token
+      with:
+        app-id: ${{ vars.APP_ID }}
+        private-key: ${{ secrets.PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ steps.app-token.outputs.token != '' && steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        submodules: ${{ inputs.CHECKOUT_SUBMODULE == 'true' && 'recursive' || 'false' }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Serverless Framework
+      run: |
+        npm install -g serverless@4.14.4
+
+    - name: Configure AWS Creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+        role-session-name: GithubActionsRole
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Short SHA
+      run: echo "COMMIT_ID=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
+        
+    # AWS CodeArtifact Login for NPM and .NET (as an example)
+    - name: CodeArtifact Login
+      run: |
+        aws codeartifact login --tool dotnet --repository nuget-repo --domain batched --domain-owner 061669522376 --region us-east-2
+
+    # Fetch AppSettings from AWS SSM Parameter Store (backend-env needed for Serverless ENV's)
+    - name: Get Serverless ENV File
+      run: |
+        aws ssm get-parameter --name "backend-env" --with-decryption --output text --query "Parameter.Value" > .env
+      working-directory: ${{ inputs.WORK_DIR }}
+
+    - name: Fetch SSM Parameter
+      if: ${{ inputs.FETCH_SSM_PARAMETER != false }}
+      run: aws ssm get-parameter --name  "${{ vars.SSM_PARAMETER_NAME }}" --with-decryption --output text  --query "Parameter.Value" > ${{ inputs.SSM_APP_SETTINGS_PATH }}
+      working-directory: ${{ inputs.WORK_DIR }}
+
+    # Install NPM dependencies and deploy Serverless function
+    - name: Build and Deploy Serverless
+      env:
+        STAGE: ${{ inputs.ENVIRONMENT }}
+      run: |
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+        npm i
+        npm audit || true
+        set +x
+        export $(cat .env | xargs) > /dev/null  # Export environment variables from .env
+        set -x
+        NODE_ENV=${STAGE,,} npx sls deploy --stage ${STAGE,,} --verbose  # Deploy the serverless function
+      working-directory: ${{ inputs.WORK_DIR }}
+    - name: Deployment Summary
+      run: |
+        echo "## Serverless Deployment Summary - Environment: ${{ inputs.ENVIRONMENT }} :rocket:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Deployment Details" >> $GITHUB_STEP_SUMMARY
+        echo "- **Stage:** ${STAGE,,}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit ID:** ${{ env.COMMIT_ID }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Region:** ${{ vars.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Status" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Serverless deployment completed successfully!" >> $GITHUB_STEP_SUMMARY
+      env:
+        STAGE: ${{ inputs.ENVIRONMENT }}

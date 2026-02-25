@@ -1,0 +1,156 @@
+name: Publish Runner Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      runnerVersion:
+        type: string
+        description: Version of the runner to install
+      runnerControllerVersion:
+        type: string
+        description: Version of the runner controller to install
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  build:
+    runs-on: default-runner
+    outputs:
+      image: ${{ fromJson( steps.build-and-push.outputs.metadata )['image.name'] }}
+    name: Build Github Runner Image
+    environment: DevOps
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEVOPS_AWS_ROLE }}
+          role-session-name: GithubActionsRole
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v6
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: actions-runner
+          DOCKER_BUILD_SUMMARY: false
+          DOCKER_BUILD_RECORD_UPLOAD: false
+        with:
+          context: ./GithubActionsRunnerConfig
+          platforms: |
+            linux/amd64
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.event.inputs.runnerVersion }}
+          build-args: |
+            RUNNER_VERSION=${{ github.event.inputs.runnerVersion }}
+          provenance: false
+          load: true
+          push: true
+
+      - name: Scan built image with Inspector
+        uses: aws-actions/vulnerability-scan-github-action-for-amazon-inspector@v1
+        id: inspector
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: actions-runner
+        with:
+          display_vulnerability_findings: "enabled"
+          artifact_type: 'container'
+          artifact_path: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.event.inputs.runnerVersion }}' # make sure this matches the image you built
+          platform: 'linux/amd64'
+          critical_threshold: 1
+
+      - name: Display Inspector vulnerability scan results (markdown)
+        run: cat ${{ steps.inspector.outputs.inspector_scan_results_markdown }}
+
+      - name: Fail job if vulnerability threshold is exceeded
+        run: exit ${{ steps.inspector.outputs.vulnerability_threshold_exceeded }}
+
+  upgrade:
+    needs: build
+    runs-on: default-runner
+    name: Upgrade Runner Image and Controller Version
+    environment: DevOps
+    env:
+      NAMESPACE: arc-systems
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEVOPS_AWS_ROLE }}
+          role-session-name: GithubActionsRole
+          aws-region: us-east-1
+      
+      - name: KubeConfig
+        run: aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name ${{ vars.CLUSTER_NAME }}
+
+      - name: Upgrade Github Actions Runner Controller
+        run: |
+          helm upgrade -i arc \
+              --namespace ${{ env.NAMESPACE }} \
+              --create-namespace \
+              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller -f values.yaml --version ${{ inputs.runnerControllerVersion }}
+        working-directory: ./GithubActionsRunnerConfig/controller
+
+      - name: Upgrade Github Actions Runner - Default
+        env:
+          RUNNER_NAME: arc-runner-set-default
+        run: |
+          helm upgrade -i ${{ env.RUNNER_NAME }} \
+              --namespace ${{ env.NAMESPACE }} \
+              --create-namespace \
+              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+              -f values.yaml --set-string template.spec.containers[0].image=${{ needs.build.outputs.image }} \
+              --version ${{ inputs.runnerControllerVersion }}
+        working-directory: ./GithubActionsRunnerConfig/runner-set-1-default
+
+      - name: Upgrade Github Actions Runner - Batched Dev
+        env:
+          RUNNER_NAME: arc-runner-set-batched-dev
+        run: |
+          helm upgrade -i ${{ env.RUNNER_NAME }} \
+              --namespace ${{ env.NAMESPACE }} \
+              --create-namespace \
+              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+              -f values.yaml --set-string template.spec.containers[0].image=${{ needs.build.outputs.image }} \
+              --version ${{ inputs.runnerControllerVersion }}
+        working-directory: ./GithubActionsRunnerConfig/runner-set-batched-dev
+
+      - name: Upgrade Github Actions Runner - Batched Prod
+        env:
+          RUNNER_NAME: arc-runner-set-batched-prod
+        run: |
+          helm upgrade -i ${{ env.RUNNER_NAME }} \
+              --namespace ${{ env.NAMESPACE }} \
+              --create-namespace \
+              oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+              -f values.yaml --set-string template.spec.containers[0].image=${{ needs.build.outputs.image }} \
+              --version ${{ inputs.runnerControllerVersion }}
+        working-directory: ./GithubActionsRunnerConfig/runner-set-batched-prod
+
+  test:
+    needs: upgrade
+    name: Test Runner Upgraded Images
+    strategy:
+      matrix:
+        runner: [default-runner, batched-dev-runner, batched-prod-runner]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 5
+    steps:
+      - name: Testing Hello World
+        run: echo "Hello World"

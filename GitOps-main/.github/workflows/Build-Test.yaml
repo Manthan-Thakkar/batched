@@ -1,0 +1,80 @@
+name: Build Test Workflow
+on:
+  workflow_call:
+    inputs:
+      CODE_TYPE:
+        type: string
+        required: true
+        default: DOTNET
+      WORK_DIR:
+        type: string
+        required: false
+        default: .
+      CHECKOUT_SUBMODULE:
+        type: string
+        required: false
+        default: "false"
+      USE_GITHUB_APP:
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  build_test:
+    if: ${{ github.event_name == 'push' }}
+    name: Build Test
+    environment: Test
+    runs-on: default-runner
+    steps:
+    - name: Generate Github Token
+      if: ${{ inputs.USE_GITHUB_APP != false }}
+      uses: actions/create-github-app-token@v1
+      id: app-token
+      with:
+        app-id: ${{ vars.APP_ID }}
+        private-key: ${{ secrets.PRIVATE_KEY }}
+        owner: ${{ github.repository_owner }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ steps.app-token.outputs.token != '' && steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        submodules: ${{ inputs.CHECKOUT_SUBMODULE == 'true' && 'recursive' || 'false' }}
+    - name: Configure AWS Creds
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+        role-session-name: GithubActionsRole
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Setup Node
+      if: ${{ inputs.CODE_TYPE == 'NODE' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Fetch AWS Parameter Value for Node
+      if: ${{ inputs.CODE_TYPE == 'NODE' }}
+      run: aws ssm get-parameter --name  "${{ vars.SSM_PARAMETER_NAME }}" --with-decryption --output text  --query "Parameter.Value" > .env
+
+    - name: Code Artifact Login for Dotnet
+      if: ${{ inputs.CODE_TYPE == 'DOTNET' }}
+      run: aws codeartifact login --tool dotnet --domain batched --repository nuget-repo
+
+    - name: Code Artifact Login for Node
+      if: ${{ inputs.CODE_TYPE == 'NODE' }}
+      run: aws codeartifact login --tool npm --domain batched --repository npm-repo
+
+    - name: Build and Test for Dotnet
+      if: ${{ inputs.CODE_TYPE == 'DOTNET' }}
+      run: |
+        dotnet restore
+        dotnet build
+        dotnet test
+      working-directory: ${{ inputs.WORK_DIR }}
+
+    - name: Build and Test for Node
+      if: ${{ inputs.CODE_TYPE == 'NODE' }}
+      run: |
+        npm install --legacy-peer-deps
+        npm run-script build
+      working-directory: ${{ inputs.WORK_DIR }}

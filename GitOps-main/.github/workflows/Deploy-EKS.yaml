@@ -1,0 +1,56 @@
+name: Docker Build Workflow
+on:
+  workflow_call:
+    inputs:
+        ENVIRONMENT:
+          type: string
+          required: true
+        RUNNER_LABEL:
+          type: string
+          required: true
+        DEPLOYMENT_NAME:
+          type: string
+          required: true
+        IMAGE_TAG:
+          type: string
+          required: true
+        HELM_PACKAGE_PATH:
+          type: string
+          required: false
+        HELM_PACKAGE_VERSION:
+          type: string
+          required: true
+
+jobs:
+  eks_deploy:
+      name: EKS Deploy with Helm Package
+      environment: ${{ inputs.ENVIRONMENT }}
+      runs-on: ${{ inputs.RUNNER_LABEL }}
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Configure AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+          role-session-name: GithubActionsRole
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: KubeConfig
+        run: aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name ${{ vars.CLUSTER_NAME }}
+      - name: Helm Upgrade
+        run: |
+          helm registry login ghcr.io -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }}
+          helm upgrade --install ${{ inputs.DEPLOYMENT_NAME }} -n ${{ vars.DEPLOYMENT_NAMESPACE }} --set image.tag=${{ inputs.IMAGE_TAG }} -f ${{ vars.VALUES_FILE_PATH }} ${{ inputs.HELM_PACKAGE_PATH }} --version ${{ inputs.HELM_PACKAGE_VERSION }}
+      - name: Deployment Summary
+        run: |
+          echo "## EKS Deployment Summary - Environment: ${{ inputs.ENVIRONMENT }} :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployment Name:** ${{ inputs. DEPLOYMENT_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image Tag:** ${{ inputs.IMAGE_TAG }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Cluster Name:** ${{ vars. CLUSTER_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Namespace:** ${{ vars.DEPLOYMENT_NAMESPACE }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Region:** ${{ vars.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Status" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Deployment completed successfully!" >> $GITHUB_STEP_SUMMARY

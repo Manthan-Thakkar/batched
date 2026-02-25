@@ -1,0 +1,21 @@
+﻿CREATE TABLE [dbo].[PV_Customer]
+(
+	[CompNum] int NULL,
+	[CustActive] int NULL,
+	[CustCode] nvarchar(4000) NULL,
+	[CustGroup] nvarchar(4000) NULL,
+	[CustLongName] nvarchar(4000) NULL,
+	[CustName] nvarchar(4000) NULL,
+	[CustStatus] int NULL,
+	[CustType] int NULL,
+	[LastInvoiceDate] datetime NULL,
+	[LastUpdatedDateTime] nvarchar(4000) NULL,
+	[LastUserCode] nvarchar(4000) NULL,
+	[OversPercent] decimal(18, 0) NULL,
+	[TableRecId] bigint NULL,
+	[TaxCode] nvarchar(4000) NULL,
+	[TermsCode] nvarchar(4000) NULL,
+	[UndersPercent] decimal(18, 0) NULL,
+	[MonSalesAgentID] nvarchar(4000) NULL,
+	[Notes] nvarchar(4000) NULL,
+) 

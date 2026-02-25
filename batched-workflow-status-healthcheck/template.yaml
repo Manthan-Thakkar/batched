@@ -1,0 +1,411 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  batched-workflow-status-lambda
+
+Globals:
+  Function:
+    Timeout: 60
+    Architectures: [arm64]
+
+Resources:
+
+  # EventBridge Scheduler Groups for each health check workflow
+  RulesEngineHealthCheckSchedulerGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: rules-engine-healthcheck-schedules
+
+  WorkflowJobHealthCheckSchedulerGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: workflow-job-healthcheck-schedules
+
+  AgentHeartBeatHealthCheckSchedulerGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: agent-heartbeat-healthcheck-schedules
+
+  AlgoWebHealthCheckSchedulerGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: algoweb-healthcheck-schedules
+
+  # SQS FIFO Queues
+  RulesEngineStepQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: RulesEngineStep-HealthCheck.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 120
+      MessageRetentionPeriod: 345600
+
+  WorkflowJobQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: WorkflowJob-HealthCheck.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 120
+      MessageRetentionPeriod: 345600
+
+  AgentHeartBeatQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: AgentHeartBeat-HealthCheck.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 120
+      MessageRetentionPeriod: 345600
+
+  AlgoWebQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: AlgoWeb-HealthCheck.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 120
+      MessageRetentionPeriod: 345600
+
+
+  RulesEngineStepWorkflowHealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: RulesEngine-Workflow-HealthCheck
+      CodeUri: functions/RulesEngineStepStatus/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      MemorySize: 512
+      Environment:
+        Variables:
+          sns_topic_arn: '{{resolve:ssm:/batched-workflow-status-envs/sns_topic_arn}}'
+          environment: '{{resolve:ssm:/batched-workflow-status-envs/environment}}'
+          ES_DURATION: '{{resolve:ssm:/batched-workflow-status-envs/es_duration}}'
+          redis_host: '{{resolve:ssm:/batched-workflow-status-envs/redis_host}}'
+          WEBHOOK_URL: '{{resolve:ssm:/batched-workflow-status-envs/webhook_url}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "SNS:Publish"
+          - "cloudwatch:*"
+          - "sqs:ReceiveMessage"
+          - "sqs:DeleteMessage"
+          - "sqs:GetQueueAttributes"
+          Resource:
+          - "*"
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt RulesEngineStepQueue.Arn
+            BatchSize: 1
+  RulesEngineStepWorkflowHealthCheckLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties: 
+      FunctionName: !GetAtt RulesEngineStepWorkflowHealthCheckFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+      SourceArn: !Sub 'arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*'
+  RulesEngineStepWorkflowHealthCheckTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: false
+      Name: RulesEngWorkflow-HealthCheck-TG
+      TargetType: lambda
+      Targets:
+      - Id: !GetAtt RulesEngineStepWorkflowHealthCheckFunction.Arn
+  RulesEngineStepWorkflowHealthCheckListenRules:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions: 
+        - Type: forward
+          TargetGroupArn: !Ref RulesEngineStepWorkflowHealthCheckTargetGroup
+      Conditions: 
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - '{{resolve:ssm:/batched-workflow-status-envs/domain_name}}'
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/RulesStepExecution/healthcheck'
+      ListenerArn: '{{resolve:ssm:/batched-workflow-status-envs/listenerArn}}'
+      Priority: 9
+  WorkflowJobStatusCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: JobStatus-Workflow-HealthCheck
+      CodeUri: functions/WorkflowJobStatus/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      MemorySize: 512
+      Environment:
+        Variables:
+          sns_topic_arn: '{{resolve:ssm:/batched-workflow-status-envs/sns_topic_arn}}'
+          environment: '{{resolve:ssm:/batched-workflow-status-envs/environment}}'
+          ES_DURATION: '{{resolve:ssm:/batched-workflow-status-envs/es_duration}}'
+          redis_host: '{{resolve:ssm:/batched-workflow-status-envs/redis_host}}'
+          WEBHOOK_URL: '{{resolve:ssm:/batched-workflow-status-envs/webhook_url}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "SNS:Publish"
+          - "cloudwatch:*"
+          - "sqs:ReceiveMessage"
+          - "sqs:DeleteMessage"
+          - "sqs:GetQueueAttributes"
+          Resource:
+          - "*"
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt WorkflowJobQueue.Arn
+            BatchSize: 1
+  WorkflowJobStatusHealthCheckLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties: 
+      FunctionName: !GetAtt WorkflowJobStatusCheckFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+      SourceArn: !Sub 'arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*'
+  WorkflowJobStatusHealthCheckTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: false
+      Name: WorkflowJobStatus-HealthCheck-TG
+      TargetType: lambda
+      Targets:
+      - Id: !GetAtt WorkflowJobStatusCheckFunction.Arn
+  WorkflowJobStatusHealthCheckListenRules:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions: 
+        - Type: forward
+          TargetGroupArn: !Ref WorkflowJobStatusHealthCheckTargetGroup
+      Conditions: 
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - '{{resolve:ssm:/batched-workflow-status-envs/domain_name}}'
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/WorkflowJob/healthcheck'
+      ListenerArn: '{{resolve:ssm:/batched-workflow-status-envs/listenerArn}}'
+      Priority: 10
+  AgentHeartBeatHealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: AgentHeartBeat-HealthCheck
+      CodeUri: functions/AgentHeartbeatStatus/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      MemorySize: 512
+      Environment:
+        Variables:
+          sns_topic_arn: '{{resolve:ssm:/batched-workflow-status-envs/sns_topic_arn}}'
+          environment: '{{resolve:ssm:/batched-workflow-status-envs/environment}}'
+          ES_DURATION: '{{resolve:ssm:/batched-workflow-status-envs/es_duration}}'
+          redis_host: '{{resolve:ssm:/batched-workflow-status-envs/redis_host}}'
+          WEBHOOK_URL: '{{resolve:ssm:/batched-workflow-status-envs/webhook_url}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "SNS:Publish"
+          - "cloudwatch:*"
+          - "sqs:ReceiveMessage"
+          - "sqs:DeleteMessage"
+          - "sqs:GetQueueAttributes"
+          Resource:
+          - "*"
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AgentHeartBeatQueue.Arn
+            BatchSize: 1
+  AgentHeartBeatHealthCheckLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties: 
+      FunctionName: !GetAtt AgentHeartBeatHealthCheckFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+      SourceArn: !Sub 'arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*'
+  AgentHeartBeatHealthCheckTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: false
+      Name: AgentHeartBeat-HealthCheck-TG
+      TargetType: lambda
+      Targets:
+      - Id: !GetAtt AgentHeartBeatHealthCheckFunction.Arn
+  AgentHeartBeatHealthCheckListenRules:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions: 
+        - Type: forward
+          TargetGroupArn: !Ref AgentHeartBeatHealthCheckTargetGroup
+      Conditions: 
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - '{{resolve:ssm:/batched-workflow-status-envs/domain_name}}'
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/AgentHeartbeat/healthcheck'
+      ListenerArn: '{{resolve:ssm:/batched-workflow-status-envs/listenerArn}}'
+      Priority: 11
+  AlgoWebHealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: AlgoWeb-Workflow-HealthCheck
+      CodeUri: functions/AlgoWebRunStatus/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      MemorySize: 512
+      Environment:
+        Variables:
+          sns_topic_arn: '{{resolve:ssm:/batched-workflow-status-envs/sns_topic_arn}}'
+          environment: '{{resolve:ssm:/batched-workflow-status-envs/environment}}'
+          ES_DURATION: '{{resolve:ssm:/batched-workflow-status-envs/es_duration}}'
+          ALGO_ES_DURATION: '{{resolve:ssm:/batched-workflow-status-envs/algo_es_duration}}'
+          redis_host: '{{resolve:ssm:/batched-workflow-status-envs/redis_host}}'
+          WEBHOOK_URL: '{{resolve:ssm:/batched-workflow-status-envs/webhook_url}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "SNS:Publish"
+          - "cloudwatch:*"
+          - "sqs:ReceiveMessage"
+          - "sqs:DeleteMessage"
+          - "sqs:GetQueueAttributes"
+          Resource:
+          - "*"
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt AlgoWebQueue.Arn
+            BatchSize: 1
+  AlgoWebHealthCheckLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties: 
+      FunctionName: !GetAtt AlgoWebHealthCheckFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+      SourceArn: !Sub 'arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*'
+  AlgoWebHealthCheckTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: false
+      Name: AlgoWeb-HealthCheck-TG
+      TargetType: lambda
+      Targets:
+      - Id: !GetAtt AlgoWebHealthCheckFunction.Arn
+  AlgoWebHealthCheckListenRules:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions: 
+        - Type: forward
+          TargetGroupArn: !Ref AlgoWebHealthCheckTargetGroup
+      Conditions: 
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - '{{resolve:ssm:/batched-workflow-status-envs/domain_name}}'
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/AlgoWeb/healthcheck'
+      ListenerArn: '{{resolve:ssm:/batched-workflow-status-envs/listenerArn}}'
+      Priority: 12
+
+Outputs:
+  # Scheduler Group Outputs
+  RulesEngineHealthCheckSchedulerGroupName:
+    Description: "Name of the RulesEngine HealthCheck Scheduler Group"
+    Value: !Ref RulesEngineHealthCheckSchedulerGroup
+
+  WorkflowJobHealthCheckSchedulerGroupName:
+    Description: "Name of the WorkflowJob HealthCheck Scheduler Group"
+    Value: !Ref WorkflowJobHealthCheckSchedulerGroup
+
+  AgentHeartBeatHealthCheckSchedulerGroupName:
+    Description: "Name of the AgentHeartBeat HealthCheck Scheduler Group"
+    Value: !Ref AgentHeartBeatHealthCheckSchedulerGroup
+
+  AlgoWebHealthCheckSchedulerGroupName:
+    Description: "Name of the AlgoWeb HealthCheck Scheduler Group"
+    Value: !Ref AlgoWebHealthCheckSchedulerGroup
+
+  # SQS Queue Outputs
+  RulesEngineStepQueueUrl:
+    Description: "URL of the RulesEngineStep SQS FIFO Queue"
+    Value: !Ref RulesEngineStepQueue
+  
+  RulesEngineStepQueueArn:
+    Description: "ARN of the RulesEngineStep SQS FIFO Queue"
+    Value: !GetAtt RulesEngineStepQueue.Arn
+
+  WorkflowJobQueueUrl:
+    Description: "URL of the WorkflowJob SQS FIFO Queue"
+    Value: !Ref WorkflowJobQueue
+  
+  WorkflowJobQueueArn:
+    Description: "ARN of the WorkflowJob SQS FIFO Queue"
+    Value: !GetAtt WorkflowJobQueue.Arn
+
+  AgentHeartBeatQueueUrl:
+    Description: "URL of the AgentHeartBeat SQS FIFO Queue"
+    Value: !Ref AgentHeartBeatQueue
+  
+  AgentHeartBeatQueueArn:
+    Description: "ARN of the AgentHeartBeat SQS FIFO Queue"
+    Value: !GetAtt AgentHeartBeatQueue.Arn
+
+  AlgoWebQueueUrl:
+    Description: "URL of the AlgoWeb SQS FIFO Queue"
+    Value: !Ref AlgoWebQueue
+  
+  AlgoWebQueueArn:
+    Description: "ARN of the AlgoWeb SQS FIFO Queue"
+    Value: !GetAtt AlgoWebQueue.Arn

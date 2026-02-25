@@ -1,0 +1,36 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: batched-prod-nodepool
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        name: batched-prod-nodeclass
+      taints:
+        - key: karpenter.sh/nodepool
+          effect: NoExecute
+      requirements:
+        # - key: node.kubernetes.io/instance-type
+        #   operator: In
+        #   values: ["t3g.medium"]
+        - key: "eks.amazonaws.com/instance-category"
+          operator: In
+          values: ["t", "m", "c"]
+        - key: "eks.amazonaws.com/instance-cpu"
+          operator: In
+          values: ["2", "4"]
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+  limits:
+    cpu: "32"
+    memory: 128Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 10m

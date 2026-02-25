@@ -1,0 +1,38 @@
+[
+  {
+    "Id": "downtime1",
+    "EquipmentId": "70E5B268-C839-417F-A9D5-9F3014730D22",
+    "StartsOn": "2023-09-23 06:00:00.000",
+    "EndsAt": "2023-09-23 11:00:00.000",
+    "Name": "test1",
+    "CreatedOnUTC": "2023-09-13T06:40:46.110",
+    "ModifiedOnUTC": "2023-09-13T06:40:46.110"
+  },
+  {
+    "Id": "downtime2",
+    "EquipmentId": "03BBD2A1-3608-44D7-97D1-AADBE2CA2546",
+    "StartsOn": "2024-05-01 00:00:00.000",
+    "EndsAt": "2024-05-01 23:59:00.000",
+    "Name": "test2",
+    "CreatedOnUTC": "2023-08-03T14:39:34.823",
+    "ModifiedOnUTC": "2023-08-03T14:39:34.823"
+  },
+  {
+    "Id": "downtime3",
+    "EquipmentId": "5BBB896B-767A-48B4-9FDA-349361FCD18A",
+    "StartsOn": "2023-10-29 00:00:00.000",
+    "EndsAt": "2023-10-29 08:00:00.000",
+    "Name": "test3",
+    "CreatedOnUTC": "2024-02-12T12:47:02.590",
+    "ModifiedOnUTC": "2024-02-12T12:47:02.590"
+  },
+  {
+    "Id": "downtime4",
+    "EquipmentId": "70E5B268-C839-417F-A9D5-9F3014730D22",
+    "StartsOn": "2023-09-23 06:00:00.000",
+    "EndsAt": "2023-09-23 11:00:00.000",
+    "Name": "test4",
+    "CreatedOnUTC": "2023-09-13T06:44:46.533",
+    "ModifiedOnUTC": "2023-09-13T06:44:46.533"
+  }
+]

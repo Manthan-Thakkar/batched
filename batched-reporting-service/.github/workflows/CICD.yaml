@@ -1,0 +1,41 @@
+name: Build and Deployment Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_to_environment:
+        type: choice
+        description: choose on which environment want to deploy
+        options:
+        - Development
+        - Production
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+  packages: read  # This is requried for reading org package
+
+jobs:
+  build:
+    name: Building Branch - ${{ github.ref_name }} with commit message -> "${{ github.event.head_commit.message }}" [${{ github.sha }}]
+    uses: LabelTraxx/GitOps/.github/workflows/Build-Docker.yaml@latest
+    with:
+      ENVIRONMENT: ${{ github.event.inputs.deploy_to_environment }}
+      RUNNER_LABEL: default-runner
+      FETCH_SSM_PARAMETER: false
+      SSM_APP_SETTINGS_PATH: Batched.Reporting.Web/appsettings.json
+      DOCKER_FILE_PATH: .
+    secrets: inherit
+
+  deploy:
+    needs: build
+    name: Deploying Branch - ${{ github.ref_name }} with commit message -> "${{ github.event.head_commit.message }}" [${{ github.sha }}]
+    uses: LabelTraxx/GitOps/.github/workflows/Deploy-EKS.yaml@latest
+    with:
+      ENVIRONMENT: ${{ github.event.inputs.deploy_to_environment }}
+      RUNNER_LABEL: "${{ github.event.inputs.deploy_to_environment == 'Development' && 'batched-dev-runner' || github.event.inputs.deploy_to_environment == 'Production' && 'batched-prod-runner' || 'default-runner' }}"
+      DEPLOYMENT_NAME: reporting-service
+      IMAGE_TAG: ${{ needs.build.outputs.commit_id }}
+      HELM_PACKAGE_PATH: oci://ghcr.io/labeltraxx/charts/helm-chart
+      HELM_PACKAGE_VERSION: v2
+    secrets: inherit

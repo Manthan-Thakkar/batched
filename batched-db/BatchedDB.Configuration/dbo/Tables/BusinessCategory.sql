@@ -1,0 +1,6 @@
+﻿CREATE TABLE BusinessCategory(
+  Id VARCHAR(36)  PRIMARY KEY NOT NULL,
+  Name VARCHAR(36) NOT NULL,
+  IsEnabled bit NOT NULL,
+  CreatedOn DATETIME NOT NULL,
+  ModifiedOn DATETIME NOT NULL);

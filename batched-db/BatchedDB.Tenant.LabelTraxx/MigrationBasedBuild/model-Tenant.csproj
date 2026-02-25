@@ -1,0 +1,12 @@
+﻿<Project Sdk="MSBuild.Sdk.SqlProj/2.9.1">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>model-Tenant</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PostDeploy Include="../PostDeploymentScripts/Script.PostDeployment.sql" />
+	</ItemGroup>
+
+</Project>

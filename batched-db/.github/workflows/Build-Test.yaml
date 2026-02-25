@@ -1,0 +1,48 @@
+name: Build Test Workflow
+
+on:
+  push:
+    branches:
+      - '**'  # Run on all branches
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  build_test:
+    if: ${{ github.event_name == 'push' }}
+    name: Build Test
+    environment: Test
+    runs-on: default-runner
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - uses: actions/setup-dotnet@v5
+      env:
+        DOTNET_INSTALL_DIR: ${{ github.workspace }}/.dotnet
+      with:
+        dotnet-version: '8'
+    
+    - name: Building Batched DB project
+      run: dotnet build
+      working-directory: ./BatchedDB.Configuration/MigrationBasedBuild
+
+    - name: Building LabelTraxx ModelTenant DB
+      run: dotnet build
+      working-directory: ./BatchedDB.Tenant.LabelTraxx/StateBasedBuild
+
+    - name: Building LabelTraxx Migration build
+      run: dotnet build
+      working-directory: ./BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild
+
+    - name: Building Radius ModelTenant DB
+      run: dotnet build
+      working-directory: ./BatchedDB.Tenant.Radius/StateBasedBuild
+
+    - name: Building Radius Migration build
+      run: dotnet build
+      working-directory: ./BatchedDB.Tenant.Radius/MigrationBasedBuild

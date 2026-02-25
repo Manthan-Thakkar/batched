@@ -1,0 +1,22 @@
+[
+  {
+    "Id": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "Name": "Priority Rule",
+    "Reason": "Jobs tagged with 'RUSH' priority will always receive 3 days lead time.",
+    "LeadTimeInDays": 3,
+    "CreatedBy": "Harry Potter",
+    "ModifiedBy": "Harry Potter",
+    "CreatedOnUtc": "2022-11-21 07:10:27.337",
+    "ModifiedOnUtc": "2022-11-21 07:10:27.337"
+  },
+  {
+    "Id": "4233c3a8-c524-4a2f-88c2-5b177955baf7",
+    "Name": "Ticket Rush",
+    "Reason": "Need to rush the jobs delivered within 7 days.",
+    "LeadTimeInDays": 7,
+    "CreatedBy": "Severus Snape",
+    "ModifiedBy": "Severus Snape",
+    "CreatedOnUtc": "2022-11-22 07:10:27.337",
+    "ModifiedOnUtc": "2022-11-22 07:10:27.337"
+  }
+]

@@ -1,0 +1,13 @@
+﻿ CREATE TABLE ScheduleEventLog(
+	Id NVARCHAR(36)  PRIMARY KEY NOT NULL,
+	TenantId NVARCHAR(36) NOT NULL,
+	FacilityId VARCHAR(36) NULL,
+	ValueStreams VARCHAR(4000) NULL,
+	ScheduleId NVARCHAR(36) NOT NULL,
+	ScheduledOn DATETIME NULL,
+	Status NVARCHAR(36) NOT NULL,
+	Type   NVARCHAR(10) NOT NULL,
+	Error	NVARCHAR(4000) NULL,
+	CreatedOn Datetime NOT NULL,
+	ModifiedOn Datetime NOT NULL
+  );

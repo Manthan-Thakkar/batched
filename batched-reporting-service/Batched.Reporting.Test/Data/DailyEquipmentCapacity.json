@@ -1,0 +1,122 @@
+[
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-01",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-02",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-03",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-04",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-05",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-06",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-07",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-08",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-08",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-10",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-11",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "1",
+    "Date": "2024-01-12",
+    "PlannedHours": "7.866666"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-01",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-02",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-03",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-04",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-05",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-06",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-07",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-08",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-08",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-10",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-11",
+    "PlannedHours": "15.850000"
+  },
+  {
+    "SourceEquipmentId": "10",
+    "Date": "2024-01-12",
+    "PlannedHours": "15.850000"
+  }
+]

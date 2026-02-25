@@ -1,0 +1,16 @@
+apiVersion: eks.amazonaws.com/v1
+kind: IngressClassParams
+metadata:
+  name: alb
+spec:
+  scheme: internal
+  group:
+    name: devops-private-alb
+  subnets:
+    matchTags:
+      - key: "kubernetes.io/role/internal-elb"
+        values:
+          - "1"
+  inboundCIDRs:
+    - 10.10.16.0/24
+    - 10.101.0.0/16

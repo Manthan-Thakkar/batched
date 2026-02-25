@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Template for a self-managed webhook.
+  The webhook is intended for use with Uptime Kuma and parses the event,
+  then publishes a message to an SNS topic.
+
+Globals:
+  Function:
+    Timeout: 10
+    Architectures: [arm64]
+
+Resources:
+  # Lambda Function to handle webhook events
+  WebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: WebhookFunction
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      CodeUri: webhook/        # Directory containing your Lambda code (e.g., app.py)
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref WebhookTopic
+          IMPORTANT_SNS_TOPIC_ARN: arn:aws:sns:us-east-1:033237185297:BatchedProdP1Alerts-UptimeKuma
+          LABELTRAXX_SNS_TOPIC_ARN: arn:aws:sns:us-east-1:496290777637:Default_CloudWatch_Alarms_Topic
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "s3:*"
+          - "SNS:Publish"
+          Resource:
+          - "*"
+      Events:
+        WebhookApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref WebhookApi
+            Path: /
+            Method: post
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-workflow-status-envs/SubnetIds2}}'
+
+  # API Gateway REST API (Private)
+  WebhookApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration:
+        Type: PRIVATE
+        VPCEndpointIds:
+          - '{{resolve:ssm:/batched-workflow-status-envs/ExistingVPCEndpointId}}'
+      Cors:
+        AllowMethods: "'POST, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+      Auth:
+        ResourcePolicy:
+          CustomStatements:
+            - Effect: Allow
+              Principal: "*"
+              Action: execute-api:Invoke
+              Resource: "execute-api:/*/*/*"
+              Condition:
+                StringEquals:
+                  "aws:sourceVpce": '{{resolve:ssm:/batched-workflow-status-envs/ExistingVPCEndpointId}}'
+
+  # SNS Topic to publish parsed messages
+  WebhookTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: WebhookTopic
+
+Outputs:
+  WebhookApiUrl:
+    Description: "API Gateway endpoint URL for webhook (accessible only from VPC)"
+    Value: !Sub "https://${WebhookApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    Export:
+      Name: !Sub "${AWS::StackName}-WebhookApiUrl"
+  
+  VPCEndpointId:
+    Description: "VPC Endpoint ID used for the private API"
+    Value: '{{resolve:ssm:/batched-workflow-status-envs/ExistingVPCEndpointId}}'
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCEndpointId"
+  
+  LambdaFunctionName:
+    Description: "Name of the Lambda function"
+    Value: !Ref WebhookFunction
+    Export:
+      Name: !Sub "${AWS::StackName}-LambdaFunctionName"
+  
+  SNSTopicArn:
+    Description: "ARN of the SNS topic"
+    Value: !Ref WebhookTopic
+    Export:
+      Name: !Sub "${AWS::StackName}-SNSTopicArn"

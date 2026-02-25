@@ -1,0 +1,28 @@
+[
+  {
+    "id": "reservation1",
+    "name": "test456",
+    "facilityId": "04f6ffbc-7751-4c61-9591-ebf7fc409c6c",
+    "startDate": "2024-05-31T00:00:00",
+    "isRecurring": false,
+    "reservationRecurrenceId": null,
+    "expirationDays": 10,
+    "createdBy": "kadam@amendllc.com",
+    "modifiedBy": "admin@batched.com",
+    "CreatedOnUTC": "2023-08-03T14:39:34.823",
+    "ModifiedOnUTC": "2023-08-03T14:39:34.823"
+  },
+  {
+    "id": "reservation2",
+    "name": "test123",
+    "facilityId": "04f6ffbc-7751-4c61-9591-ebf7fc409c6c",
+    "startDate": "2024-05-31T00:00:00",
+    "isRecurring": false,
+    "reservationRecurrenceId": null,
+    "expirationDays": 5,
+    "createdBy": "kadam@amendllc.com",
+    "modifiedBy": "admin@batched.com",
+    "CreatedOnUTC": "2023-08-03T14:39:34.823",
+    "ModifiedOnUTC": "2023-08-03T14:39:34.823"
+  }
+]

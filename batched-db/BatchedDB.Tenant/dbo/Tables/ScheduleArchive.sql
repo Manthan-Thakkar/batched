@@ -1,0 +1,33 @@
+﻿CREATE TABLE [dbo].[ScheduleArchive]
+(
+	Id varchar(36) NOT NULL PRIMARY KEY,
+	ScheduleId varchar(36) NOT NULL,
+	EquipmentId varchar(36) NOT NULL,
+	OriginalEquipmentId varchar(36) NULL,
+	SourceTicketId nvarchar(255) NULL,
+	TaskName nvarchar(255) NOT NULL,
+	StartsAt datetime NOT NULL,	
+	EndsAt datetime NOT NULL,
+	ChangeoverMinutes float NULL,
+	TaskMinutes float NULL,
+	IsPinned bit NULL,
+	FeasibilityOverride bit NULL,
+	IsUpdated bit NULL,
+	IsCalculated bit NULL,
+	MasterRollNumber varchar(255) NULL,
+	CreatedOn datetime NOT NULL,
+	ModifiedOn datetime NOT NULL,
+	PinType nvarchar(24) NULL,
+	ChangeoverCount int NULL,
+	ChangeoverDescription nvarchar(4000) NULL, 
+    ForcedGroup nvarchar(128) NULL,
+	TicketId varchar(36) NOT NULL,
+	EstMeters real NULL,
+	TaskStatus varchar(128) NULL,
+	ShipByDateTime datetime NULL,
+	Quantity int NULL,
+	ActualQuantity int NULL,
+	EstimatedLength int NULL,
+	ArchivedOn datetime NOT NULL, -- DateTime in tenant's timezone
+	ArchivedOnUTC datetime NOT NULL -- DateTime in UTC
+)

@@ -1,0 +1,21 @@
+﻿CREATE TABLE [dbo].[wi-head](
+	[wih-title] [nvarchar](4000) NULL,
+	[wih-product] [nvarchar](4000) NULL,
+	[kco] [int] NULL,
+	[k-est-code] [nvarchar](4000) NULL,
+	[wih-creation-date] [datetime] NULL,
+	[wih-last-amended-date] [datetime] NULL,
+	[wih-amended-by] [nvarchar](4000) NULL,
+	[k-module] [nvarchar](4000) NULL,
+	[wih-status] [int] NULL,
+	[korder] [nvarchar](4000) NULL,
+	[wih-version] [int] NULL,
+	[wih-code1] [nvarchar](4000) NULL,
+	[wih-code2] [nvarchar](4000) NULL,
+	[wih-code3] [nvarchar](4000) NULL,
+	[wih-master-copied] [nvarchar](4000) NULL,
+	[MinorProductGroup] [nvarchar](4000) NULL,
+	[WIStatus] [int] NULL,
+	[WIVersion] [datetime] NULL,
+	[WIVersionNum] [int] NULL
+)

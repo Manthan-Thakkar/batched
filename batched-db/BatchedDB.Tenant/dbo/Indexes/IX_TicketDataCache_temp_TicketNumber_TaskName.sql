@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IX_TicketDataCache_temp_TicketNumber_TaskName ON [dbo].[TicketDataCache_temp] ([TicketNumber], [TaskName]);

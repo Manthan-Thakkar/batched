@@ -1,0 +1,82 @@
+name: Batched LabelTraxx Single Tenant DB Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_to_environment:
+        type: choice
+        description: choose on which environment want to deploy
+        options:
+        - Development
+        - Production
+      database_name:
+        required: true
+        type: string
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+
+  setup:
+    name: Setup Single Tenant
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: "${{ github.event.inputs.deploy_to_environment == 'Development' && 'batched-dev-runner' || github.event.inputs.deploy_to_environment == 'Production' && 'batched-prod-runner' || 'default-runner' }}"
+    defaults:
+      run:
+        working-directory: ./BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - uses: actions/setup-dotnet@v5
+      env:
+        DOTNET_INSTALL_DIR: ${{ github.workspace }}/.dotnet
+      with:
+        dotnet-version: '8'
+    
+    - name: Build LabelTraxx tenant's Base DB
+      run: dotnet build
+
+    - name: Upload file artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lt-dacpac-file
+        path: ./BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/bin/Debug/netstandard2.0/model-Tenant.dacpac
+
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 Deployment Information - Environment: **${{ github.event.inputs.deploy_to_environment }}**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow:** Batched LabelTraxx Single Tenant DB Deploy" >> $GITHUB_STEP_SUMMARY
+        echo "- **Job:** Setup Single Tenant" >> $GITHUB_STEP_SUMMARY
+        echo "- **Database:** ${{ github.event.inputs.database_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered By:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  run-migration:
+    needs: setup
+    name: "Migration for ${{ github.event.inputs.database_name }}"
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: "${{ github.event.inputs.deploy_to_environment == 'Development' && 'batched-dev-runner' || github.event.inputs.deploy_to_environment == 'Production' && 'batched-prod-runner' || 'default-runner' }}"
+    
+    steps:
+      - name: Download file artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lt-dacpac-file
+          path: .
+      - name: Migrate database ${{ github.event.inputs.database_name }}
+        run: |
+          echo "Migrating database: ${{ github.event.inputs.database_name }}"
+          export PATH="$HOME/.dotnet/tools:$PATH"
+          sqlpackage /Action:Publish \
+          /SourceFile:./model-Tenant.dacpac \
+          /TargetServerName:${{ secrets.DB_TSN }},1433 \
+          /TargetDatabaseName:${{ github.event.inputs.database_name }} \
+          /TargetUser:${{ secrets.DB_USERNAME }} \
+          /TargetPassword:'${{ secrets.DB_PASSWORD }}' \
+          /DeployScriptPath:"./Result-${{ github.run_number }}.txt" \
+          /p:TreatVerificationErrorsAsWarnings=True \
+          /p:BlockOnPossibleDataLoss=True

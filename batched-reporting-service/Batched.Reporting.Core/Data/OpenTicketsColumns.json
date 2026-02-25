@@ -1,0 +1,50 @@
+[
+  {
+    "FieldName": "ticketNumber",
+    "DisplayName": "Ticket"
+  },
+  {
+    "FieldName": "customerName",
+    "DisplayName": "Customer"
+  },
+  {
+    "FieldName": "generalDescription",
+    "DisplayName": "Description"
+  },
+  {
+    "FieldName": "shipByDate",
+    "DisplayName": "Ship Date"
+  },
+  {
+    "FieldName": "taskName",
+    "DisplayName": "Task"
+  },
+  {
+    "FieldName": "workcenterName",
+    "DisplayName": "Workcenter"
+  },
+  {
+    "FieldName": "plannedEquipment",
+    "DisplayName": "Planned Equipment"
+  },
+  {
+    "FieldName": "scheduledEquipment",
+    "DisplayName": "Scheduled Equipment"
+  },
+  {
+    "FieldName": "estimatedLength",
+    "DisplayName": "Est. Length"
+  },
+  {
+    "FieldName": "estimatedQuantity",
+    "DisplayName": "Est. Quantity"
+  },
+  {
+    "FieldName": "estimatedTotalHours",
+    "DisplayName": "Est. Hours"
+  },
+  {
+    "FieldName": "scheduledHours",
+    "DisplayName": "Scheduled Hours"
+  }
+]

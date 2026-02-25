@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[PV_Tools]
+(
+	[CompNum] int NULL,
+	[TableRecId] bigint NULL,
+	[LastUserCode] nvarchar(4000) NULL,
+	[SpecCode] nvarchar(4000) NULL,
+	[ToolTypeCode] nvarchar(4000) NULL,
+	[ToolCode] nvarchar(4000) NULL,
+	[ToolStatus] int NULL,
+	[WhouseCode] nvarchar(4000) NULL,
+	[RackCode] nvarchar(4000) NULL,
+	[RowCode] nvarchar(4000) NULL,
+	[BinCode] nvarchar(4000) NULL,
+	[SuppCode] nvarchar(4000) NULL,
+	[POAddrNum] int NULL,
+	[OrderNum] nvarchar(4000) NULL,
+	[OrderDate] datetime NULL,
+	[DeliveryDue] datetime NULL,
+	[OwnerPlant] nvarchar(4000) NULL,
+	[CustCode] nvarchar(4000) NULL,
+	[SizeAcross] decimal(18, 0) NULL,
+	[SizeDown] decimal(18, 0) NULL,
+	[PlantCode] nvarchar(4000) NULL,
+	[StatusAvailable] int NULL,
+	[LastMoveDate] datetime NULL,
+	[LastUpdatedDateTime] nvarchar(4000) NULL
+) 

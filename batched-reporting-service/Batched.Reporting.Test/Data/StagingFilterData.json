@@ -1,0 +1,274 @@
+[
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "C1FC87A5-C531-4DE5-922B-588897EA3A52",
+        "Name": "Cores"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "da091dd6-dd2f-4afb-b173-311ee8bd9c0f",
+    "WorkcenterName": "Rewinder",
+    "EquipmentId": "235D50BB-C972-4B26-B867-804AA904A847",
+    "EquipmentName": "11"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "C1FC87A5-C531-4DE5-922B-588897EA3A52",
+        "Name": "Cores"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "da091dd6-dd2f-4afb-b173-311ee8bd9c0f",
+    "WorkcenterName": "Rewinder",
+    "EquipmentId": "29EDFCB6-1DE1-4C41-A8A3-D789A64A756D",
+    "EquipmentName": "12B"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d51f5d87-8291-4d2a-addb-a37093f51fb4",
+    "WorkcenterName": "Digicon Finishing",
+    "EquipmentId": "4C571EFE-405D-4A8A-BA0D-063A0645F9AC",
+    "EquipmentName": "26"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "C1FC87A5-C531-4DE5-922B-588897EA3A52",
+        "Name": "Cores"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      },
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "da091dd6-dd2f-4afb-b173-311ee8bd9c0f",
+    "WorkcenterName": "Rewinder",
+    "EquipmentId": "4CC6D48F-831E-4E84-9A9C-0A91C549049E",
+    "EquipmentName": "12"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "adafc799-6fb6-41d0-be45-a7b04ac06a95",
+    "WorkcenterName": "Blank Label Press",
+    "EquipmentId": "5BBB896B-767A-48B4-9FDA-349361FCD18A",
+    "EquipmentName": "5X"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "8dbb8703-38c2-49f5-aa08-bc441e0fbb28",
+    "WorkcenterName": "Digital HP",
+    "EquipmentId": "78883DD5-CD13-4AD0-A8F1-3418BAB89C5B",
+    "EquipmentName": "1"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "1703073B-7A7D-48EF-A20D-2C7707F6B7DF",
+        "Name": "Inks"
+      },
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "ead00d5d-4948-438c-86c1-e84acdce7349",
+    "WorkcenterName": "Flexo Press",
+    "EquipmentId": "942F4B34-4110-4BB8-88AE-2D8442CE8BE4",
+    "EquipmentName": "2"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "1703073B-7A7D-48EF-A20D-2C7707F6B7DF",
+        "Name": "Inks"
+      },
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      },
+      {
+        "Id": "598832BA-4541-410D-9289-1557F72CBC9F",
+        "Name": "Art Proofs"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      },
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "bc710192-c879-4511-a15c-856c8e2ccb51",
+    "WorkcenterName": "Hybrid Press",
+    "EquipmentId": "AD43C87E-BE35-4D93-A7B8-D63878799708",
+    "EquipmentName": "3X"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "adafc799-6fb6-41d0-be45-a7b04ac06a95",
+    "WorkcenterName": "Blank Label Press",
+    "EquipmentId": "B8A5C5C6-9ACA-4671-914F-A567C7FC62B7",
+    "EquipmentName": "16"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d51f5d87-8291-4d2a-addb-a37093f51fb4",
+    "WorkcenterName": "Digicon Finishing",
+    "EquipmentId": "CBC19279-B647-4713-918C-18ADB8E63B2E",
+    "EquipmentName": "7"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d51f5d87-8291-4d2a-addb-a37093f51fb4",
+    "WorkcenterName": "Digicon Finishing",
+    "EquipmentId": "D2CB3B43-5110-4956-BB09-EDD8EE54C179",
+    "EquipmentName": "10"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      },
+      {
+        "Id": "598832BA-4541-410D-9289-1557F72CBC9F",
+        "Name": "Art Proofs"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "7347e074-d63d-4df8-92dc-d34f2f4f6d38",
+    "WorkcenterName": "Digital Inkjet",
+    "EquipmentId": "E4F31979-9A4C-4FCD-BFDF-57B997798145",
+    "EquipmentName": "6"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d7f13a9c-6f8b-4951-9584-40f09f747f65",
+    "WorkcenterName": "Sheeter",
+    "EquipmentId": "FEDEFAEF-62DB-4A44-A674-A124437BED17",
+    "EquipmentName": "14"
+  }
+]

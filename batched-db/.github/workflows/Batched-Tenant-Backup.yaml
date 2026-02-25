@@ -1,0 +1,101 @@
+name: Dev Batched DB Backup Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_to_environment:
+        type: choice
+        description: choose on which environment want to deploy
+        options:
+        - Development
+      database_name:
+        required: true
+        type: string
+      backup_bucket_name:
+        required: true
+        type: string
+        default: batched-db
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+
+jobs:
+  generate-backup:
+    name: Generate Backup
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: batched-dev-runner
+    env:
+      DBNAME: ${{ github.event.inputs.database_name }}
+      DB_TSN: ${{ github.event.inputs.database_name == 'nosco-nosco' && secrets.RADIUS_DB_TSN || secrets.DB_TSN }}
+      DB_USERNAME: ${{ github.event.inputs.database_name == 'nosco-nosco' && secrets.RADIUS_DB_USERNAME || secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ github.event.inputs.database_name == 'nosco-nosco' && secrets.RADIUS_DB_PASSWORD || secrets.DB_PASSWORD }}
+    steps:
+      - name: Configure AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+          role-session-name: GithubActionsRole
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Create database Backup for ${{ github.event.inputs.database_name }}
+        run: |
+          TODAY="$(date +'%d-%m-%Y')"
+          echo TODAY="$TODAY" >> $GITHUB_ENV
+
+          sqlcmd \
+          -S ${{ env.DB_TSN }},1433 \
+          -U ${{ env.DB_USERNAME }} \
+          -P '${{ env.DB_PASSWORD }}' \
+          -h -1 -C \
+          -q "SET NOCOUNT ON; EXEC msdb.dbo.rds_backup_database '$DBNAME', 'arn:aws:s3:::${{ github.event.inputs.backup_bucket_name }}/$TODAY/$DBNAME-${{ github.run_number }}.bak';"
+
+      - name: Poll Backup Status
+        id: backup_status
+        run: |
+          echo "Waiting for RDS snapshot to complete…"
+          # Initial call to get TaskID
+          TaskID=$(sqlcmd \
+                    -S ${{ env.DB_TSN }},1433 \
+                    -U ${{ env.DB_USERNAME }} \
+                    -P '${{ env.DB_PASSWORD }}' \
+                    -h -1 -C \
+                    -q "EXEC msdb.dbo.rds_task_status '$DBNAME';" \
+                    | head -n1 | awk '{print $1}')
+          echo "TaskID: $TaskID"
+
+          # Loop until SUCCESS
+          STATUS=""
+          until [ "$STATUS" = "SUCCESS" ]; do
+            sleep 15
+            STATUS=$(sqlcmd \
+                      -S ${{ env.DB_TSN }},1433 \
+                      -U ${{ env.DB_USERNAME }} \
+                      -P '${{ env.DB_PASSWORD }}' \
+                      -h -1 -C \
+                      -q "EXEC msdb.dbo.rds_task_status '$DBNAME',$TaskID;" \
+                      | head -n1 | awk '{print $6}')
+            echo "Current status: $STATUS"
+
+            if [ "$STATUS" = "ERROR" ]; then
+              echo "❌ Task $TaskID failed with status: $STATUS"
+              exit 1
+            fi
+          done
+
+          echo "Backup completed successfully."
+
+      - name: Generate Pre‑signed S3 URL
+        id: presigned
+        run: |
+          # Generate the URL
+          URL=$(aws s3 presign \
+            "s3://${{ github.event.inputs.backup_bucket_name }}/$TODAY/$DBNAME-${{ github.run_number }}.bak" \
+            --expires-in 900)
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo ${{ steps.presigned.outputs.url }}
+
+      - name: Simple Teams Webhook Message
+        uses: tlolkema/simple-teams-message@1.1.0
+        with:
+          message_title: "S3 Backup for $DBNAME"
+          message_description: "${{ steps.presigned.outputs.url }}"
+          webhook: ${{vars.DEV_WEBHOOK}}

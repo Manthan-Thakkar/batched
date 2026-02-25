@@ -1,0 +1,229 @@
+// database = [
+//     BatchedDb : 'BatchedDB.Configuration',
+//     TenantDb : 'BatchedDB.Tenant'
+//]
+
+// publish_type = [
+//     state : 'StateBasedBuild',
+//     migration : 'MigrationBasedBuild'
+// ]
+
+// Region = [
+//     development : 'us-east-2',
+//     production : 'us-east-1' 
+// ]
+
+rdsPassword = [
+  production : "batched-production-rds-password"
+]
+
+rdsUsername = [
+  production : "batched-production-rds-username"
+]
+
+rdsPassword2 = [
+  production : "batched-production-rds-2-password"
+]
+
+rdsUsername2 = [
+  production : "batched-production-rds-2-username"
+]
+
+dbHostname = [
+  production : "prod-db-hostname"
+]
+
+dbHostname2 = [
+  production : "prod-db-hostname2"
+]
+
+pipeline {
+
+  agent any
+
+  parameters {
+    choice(name: 'deploy_to', choices: ['production'], description: "Select Environment Name For Deployment")
+//    choice(name: 'deploy_type', choices: ['StateBasedBuild','MigrationBasedBuild'], description: "Select Environment Name For Deployment")
+//    choice(name: 'db_deploy', choices: ['BatchedDB.Configuration','BatchedDB.Tenant'], description: "Select Environment Name For Deployment")      
+//    string(name: "TargetDb", defaultValue: " ", description: "Add the deployment description here, so it will present in the deployment history")
+  }
+  
+  stages {
+
+    // stage('script path modification') {
+    //   steps {
+
+    //     dir("BatchedDB.Tenant/PostDeploymentScripts/") {
+
+    //         sh '''
+    //           tr '\\\\\\\\' '/' < Script.PostDeployment.sql | tee Script.PostDeployment.sql
+    //         sh '''
+
+    //     }
+        
+    //   }
+    // }  
+
+    stage('Model tenant Db') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+
+          dir("BatchedDB.Tenant.LabelTraxx/StateBasedBuild/") {
+            sh '''#!/bin/bash
+            
+            // " tr '\\\\\\\\' '/' < Script.PostDeployment.sql | tee Script.PostDeployment.sql "
+
+            // cat ../PostDeploymentScripts/Script.PostDeployment.sql
+            
+            dotnet build
+            if [ $? -eq 0 ]; then
+                echo "Build is Successful"
+            else
+                echo "Build Failed"
+                exit 1
+            fi
+
+            ~/sqlpackage/sqlpackage /Action:Publish \
+            /SourceFile:./bin/Debug/netstandard2.0/model-Tenant.dacpac \
+            /TargetServerName:${DB_TSN},1433 \
+            /TargetDatabaseName:model-tenantdb-labeltraxx \
+            /TargetUser:${DB_USERNAME} \
+            /TargetPassword:${DB_PASSWORD} \
+            /DeployScriptPath:"./Result-${BUILD_NUMBER}.txt" \
+            /p:TreatVerificationErrorsAsWarnings=True \
+            /p:BlockOnPossibleDataLoss=True
+
+            
+            sh '''
+          }
+        }
+      }
+    }
+
+  stage('db list') {
+        steps {
+          withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+            sh '''#!/bin/bash
+             
+             dotnet build
+             if [ $? -eq 0 ]; then
+                echo "Build is Successful"
+             else
+                echo "Build Failed"
+                exit 1
+             fi
+
+              /opt/mssql-tools/bin/sqlcmd \
+              -S ${DB_TSN},1433 \
+              -U ${DB_USERNAME}  \
+              -P ${DB_PASSWORD} -h-1 \
+              -q "EXIT(Set NoCount ON; Use batched; Select DBname from Batched.dbo.TenantDatabase where DBname in (SELECT name FROM sys.databases))" \
+              -m 1 \
+              -o dblist
+
+              split -n l/6 -d dblist dblist-
+              tee tenantMigration{-1..-5}.sh < tenantMigration.sh >/dev/null
+            sh '''
+            }
+        }
+      }
+  }
+    stage('tenant db deploy') {
+      parallel {
+      stage('db-batch-1') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+            sh '''
+             sed -i "s/DBLIST/dblist-00/g" tenantMigration.sh
+             chmod +x tenantMigration.sh
+             ./tenantMigration.sh
+            sh '''
+            }
+        }
+        }
+      }
+      stage('db-batch-2') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+            sh '''
+             sed -i "s/DBLIST/dblist-01/g" tenantMigration-1.sh
+             chmod +x tenantMigration-1.sh
+             ./tenantMigration-1.sh
+            sh '''
+            }
+        }
+      }
+      }
+      stage('db-batch-3') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+            sh '''
+             sed -i "s/DBLIST/dblist-02/g" tenantMigration-2.sh
+             chmod +x tenantMigration-2.sh
+             ./tenantMigration-2.sh
+            sh '''
+            }
+        }
+      }
+      }
+      stage('db-batch-4') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+            sh '''
+             sed -i "s/DBLIST/dblist-03/g" tenantMigration-3.sh
+             chmod +x tenantMigration-3.sh
+             ./tenantMigration-3.sh
+            sh '''
+            }
+        }
+      }
+      }
+      stage('db-batch-5') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+            sh '''
+             sed -i "s/DBLIST/dblist-04/g" tenantMigration-4.sh
+             chmod +x tenantMigration-4.sh
+             ./tenantMigration-4.sh
+            sh '''
+            }
+        }
+      }
+      }
+      stage('db-batch-6') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+            sh '''
+             sed -i "s/DBLIST/dblist-05/g" tenantMigration-5.sh
+             chmod +x tenantMigration-5.sh
+             ./tenantMigration-5.sh
+            sh '''
+            }
+        }
+      }
+      }
+    }
+  }
+  stage('Cleanup') {
+  steps {
+    withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+      dir("BatchedDB.Tenant.LabelTraxx/MigrationBasedBuild/") {
+        sh '''
+          rm dblist
+          rm dblist-*
+          rm tenantMigration-*
+        sh '''
+        }
+    }
+  }
+  }
+  }
+
+}

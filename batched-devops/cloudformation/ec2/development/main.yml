@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cloudformation to deploy EC2 Instance'
+Parameters:
+    AmiId:
+        Type: String
+    InstanceType:
+        Type: String
+        Default: "t2.micro"
+    KeyName:
+        Type: 'AWS::EC2::KeyPair::KeyName'
+        Description: "Name of an existing Keypair to access the instance with SSH/RDP."
+    AttachIamRole:
+        Type: String
+        Default: "false"
+        AllowedValues: ["true", "false"]
+    InstanceProfile:
+        Type: String
+        Description: "IAM role for ec2 instance"
+        Default: ""
+Resources:
+  RAlgorithm:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName: !Ref KeyName
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref AmiId
+      IamInstanceProfile: !If [InsatnceProfileEnable, !Ref InstanceProfile, !Ref AWS::NoValue]
+      SubnetId: !ImportValue 'PrivateSubnetOne'
+      SecurityGroupIds: [!ImportValue 'RASecurityGroupId']
+      Tags:
+      - Key: Name
+        Value: "RAlgorithm"
+
+Conditions:
+  InsatnceProfileEnable: !Equals [!Ref AttachIamRole, true]

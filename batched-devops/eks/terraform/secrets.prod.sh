@@ -1,0 +1,2 @@
+kubectl create secret generic airflow-postgres-password --from-literal=postgresql-password="$(aws ssm get-parameter --name 'airflow-postgres-password' --with-decryption --query 'Parameter.Value' --output text)" -n airflow-prod
+kubectl create secret generic airflow-webserver-secret-key --from-literal=airflow-webserver-secret-key=myapp -n airflow-prod

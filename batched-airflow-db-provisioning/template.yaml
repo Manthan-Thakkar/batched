@@ -1,0 +1,377 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Airflow Step Functions
+Resources:
+
+#############################
+# Automated DB Provisioning
+#############################
+
+  AutomatedDBProvisioningStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: AutomatedDBProvisioning-State-Machine
+      DefinitionUri: statemachine/AutomatedDBProvisioning.asl.json
+      DefinitionSubstitutions:
+        AutomatedDBProvisioningArn: !GetAtt AutomatedDBProvisioningFunction.Arn
+      Policies:
+      - LambdaInvokePolicy:
+          FunctionName: !Ref AutomatedDBProvisioningFunction
+
+  AutomatedDBProvisioningFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: AutomatedDBProvisioning-Function
+      CodeUri: functions/automated_db_provisioning/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Layers:
+        - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/PyODBC-Layer-Arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "ssm:GetParameter"
+          Resource:
+          - "*"
+        - Effect: Allow
+          Action:
+          - "scheduler:CreateSchedule"
+          - "scheduler:UpdateSchedule"
+          - "scheduler:GetSchedule"
+          Resource:
+          - !Sub "arn:${AWS::Partition}:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/*/*"
+        - Effect: Allow
+          Action:
+          - "sts:GetCallerIdentity"
+          Resource:
+          - "*"
+        - Effect: Allow
+          Action:
+          - "iam:PassRole"
+          Resource:
+          - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/EventBridgeSchedulerToSQSRole"
+
+#############################
+# Rules Engine Step Function
+#############################
+  RulesEngineOrchestrationStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: RulesEngineOrchestration-State-Machine
+      DefinitionUri: statemachine/RulesEngine.asl.json
+      DefinitionSubstitutions:
+        RulesEngineEvalFunctionArn: !GetAtt RulesEngineEvalFunction.Arn
+        RulesEngineCheckStatusFunctionArn: !GetAtt RulesEngineCheckStatusFunction.Arn
+        NotifyStatusFunctionArn: !GetAtt NotifyStatusFunction.Arn
+      Policies:
+      - LambdaInvokePolicy:
+          FunctionName: !Ref RulesEngineEvalFunction
+      - LambdaInvokePolicy:
+          FunctionName: !Ref RulesEngineCheckStatusFunction
+      - LambdaInvokePolicy:
+          FunctionName: !Ref NotifyStatusFunction
+
+  RulesEngineEvalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: RulesEngine-EvalFunction
+      CodeUri: functions/rules_engine_orchestration/EvalFunctions/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+      - arm64
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "ssm:GetParameter"
+          Resource:
+          - "*"
+
+  RulesEngineCheckStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: RulesEngine-Check-Eval-Status
+      CodeUri: functions/rules_engine_orchestration/CheckStatus/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+      - arm64
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "ssm:GetParameter"
+          Resource:
+          - "*"
+
+  NotifyStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: Notify-RulesEngineOrchestration-Task-Status
+      CodeUri: functions/rules_engine_orchestration/NotifyStatus/
+      Handler: app.notifyStatus
+      Runtime: python3.12
+      Environment:
+        Variables:
+          sns_topic_arn: '{{resolve:ssm:/batched-rules-engine-orchestration-envs/sns_topic_arn}}'
+          environment: '{{resolve:ssm:/batched-rules-engine-orchestration-envs/environment}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Architectures:
+      - arm64
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "SNS:Publish"
+          - "cloudwatch:*"
+          Resource:
+          - "*"
+
+#############################
+# Daily Algo Scheduler
+#############################
+
+  # IAM Role for EventBridge Scheduler to invoke Lambda
+  SchedulerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SchedulerLambdaInvokePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - "*"
+
+  # EventBridge Scheduler Group for algo schedules
+  AlgoSchedulerGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: algo-trigger-schedules
+
+  TriggerAlgo:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TriggerAlgo-DailyScheduler
+      CodeUri: functions/schedule_event_pulse/
+      Handler: trigger_algo.TriggerAlgo
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Layers:
+        - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/PyODBC-Layer-Arn}}'
+      Environment:
+        Variables:
+          SCHEDULER_GROUP_NAME: !Ref AlgoSchedulerGroup
+          TARGET_LAMBDA_ARN: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:TriggerAlgo-DailyScheduler
+          SCHEDULER_EXECUTION_ROLE_ARN: !GetAtt SchedulerExecutionRole.Arn
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "ssm:GetParameter"
+          Resource:
+          - "*"
+        - Effect: Allow
+          Action:
+          - "scheduler:*"
+          - "iam:PassRole"
+          Resource: 
+          - "*"
+      Events:
+        DailyScheduleEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: "cron(0 * * * ? *)"  # Every hour
+            Input: '{"daily_scheduler": true}'
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+              MaximumEventAgeInSeconds: 300
+
+  # EventBridge Scheduler Group for facility valuestream schedules
+  FacilityValueStreamSchedulerGroup:
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties:
+      Name: facility-valuestream-schedules
+
+  TriggerAlgoForFacilityValueStream:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TriggerAlgo-ForFacilityValueStream-DailyScheduler
+      CodeUri: functions/schedule_event_pulse/
+      Handler: facilityValuestream_trigger_algo.FacilityValueStreamTriggerAlgo
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Layers:
+        - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/PyODBC-Layer-Arn}}'
+      Environment:
+        Variables:
+          SCHEDULER_GROUP_NAME: !Ref FacilityValueStreamSchedulerGroup
+          TARGET_LAMBDA_ARN: !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:TriggerAlgo-ForFacilityValueStream-DailyScheduler
+          SCHEDULER_EXECUTION_ROLE_ARN: !GetAtt SchedulerExecutionRole.Arn
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "ssm:GetParameter"
+          Resource:
+          - "*"
+        - Effect: Allow
+          Action:
+          - "scheduler:*"
+          - "iam:PassRole"
+          Resource: 
+          - "*"
+      Events:
+        DailyScheduleEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: "cron(0 * * * ? *)"  # Every hour
+            Input: '{"daily_scheduler": true}'
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+              MaximumEventAgeInSeconds: 300
+
+#############################
+# Archival Functions
+#############################
+
+  TriggerScheduleArchiveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TriggerScheduleArchive
+      CodeUri: functions/schedule_archive_pulse/
+      Handler: trigger_schedule_archive.TriggerScheduleArchive
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Layers:
+        - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/PyODBC-Layer-Arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "ssm:GetParameter"
+          Resource:
+          - "*"
+      Events:
+        ScheduleEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: "cron(*/5 * * * ? *)"
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+              MaximumEventAgeInSeconds: 60
+
+  TriggerFacilityScheduleArchive:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: TriggerFacilityScheduleArchive
+      CodeUri: functions/schedule_archive_pulse/
+      Handler: trigger_facility_level_schedule_archive.TriggerFacilityScheduleArchive
+      Runtime: python3.12
+      Architectures:
+      - x86_64
+      Layers:
+        - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/PyODBC-Layer-Arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-rules-engine-orchestration-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          - "ssm:GetParameter"
+          Resource:
+          - "*"
+      Events:
+        ScheduleEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: "cron(*/5 * * * ? *)"
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+              MaximumEventAgeInSeconds: 60
+
+Globals:
+  Function:
+    LoggingConfig:
+      LogFormat: JSON
+    Timeout: 600
+    MemorySize: 256

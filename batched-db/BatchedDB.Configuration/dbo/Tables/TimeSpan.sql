@@ -1,0 +1,7 @@
+﻿ CREATE TABLE ScheduleTimeSpan
+ (
+  Id VARCHAR(36)  PRIMARY KEY NOT NULL,
+  TimeStamp TIME NOT NULL,
+  CreatedOnUTC DATETIME,
+  ModifiedOnUTC DATETIME
+ );

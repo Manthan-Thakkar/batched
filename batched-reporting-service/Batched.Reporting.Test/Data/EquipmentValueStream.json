@@ -1,0 +1,261 @@
+[
+  {
+    "Id": "01a3d758-ac2d-4f8e-a8dc-713e1386c154",
+    "EquipmentId": "B8A5C5C6-9ACA-4671-914F-A567C7FC62B7",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:51:32.36",
+    "ModifiedOnUTC": "2024-04-23T11:51:32.36"
+  },
+  {
+    "Id": "046762a1-c9ab-4acf-9a43-274671d69a46",
+    "EquipmentId": "2B190F00-C6E3-47EE-A62C-A0F25A0BD63A",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:56:50.05",
+    "ModifiedOnUTC": "2024-04-23T11:56:50.05"
+  },
+  {
+    "Id": "0823d140-6286-4270-acab-860627fe100b",
+    "EquipmentId": "818DEBD9-D0CD-4117-B7C0-0E98C17ED87B",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T12:09:40.16",
+    "ModifiedOnUTC": "2024-04-23T12:09:40.16"
+  },
+  {
+    "Id": "178fd8c6-c5fe-47b9-824b-544a45b837cf",
+    "EquipmentId": "4C571EFE-405D-4A8A-BA0D-063A0645F9AC",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-22T16:48:50.967",
+    "ModifiedOnUTC": "2024-04-22T16:48:50.967"
+  },
+  {
+    "Id": "2342dd47-5eb9-4f66-9771-820dda067bb5",
+    "EquipmentId": "FB152F4A-AC68-4ACA-AC44-E60EF1B2914B",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:52:00.45",
+    "ModifiedOnUTC": "2024-04-23T11:52:00.45"
+  },
+  {
+    "Id": "2c6ac1f7-95f0-41c7-9051-25c015fcd10e",
+    "EquipmentId": "AA775DBD-D26D-49E5-A2C5-CDC583D04E1C",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:51:26.323",
+    "ModifiedOnUTC": "2024-04-23T11:51:26.323"
+  },
+  {
+    "Id": "386483ba-233b-4273-8e82-b75d05408265",
+    "EquipmentId": "78883DD5-CD13-4AD0-A8F1-3418BAB89C5B",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-07-07T23:25:22.19",
+    "ModifiedOnUTC": "2024-07-07T23:25:22.19"
+  },
+  {
+    "Id": "3c118834-db19-4584-8ffd-d9c0dfab54bb",
+    "EquipmentId": "AD43C87E-BE35-4D93-A7B8-D63878799708",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-22T16:50:09.143",
+    "ModifiedOnUTC": "2024-04-22T16:50:09.143"
+  },
+  {
+    "Id": "3ca300ab-0e27-41e9-807b-870709fdf64b",
+    "EquipmentId": "1BC4AE13-1687-4521-BBDF-DEF9F64F53CC",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:56:45.483",
+    "ModifiedOnUTC": "2024-04-23T11:56:45.483"
+  },
+  {
+    "Id": "3cad6d27-c8b9-435a-b111-b4225a746aa7",
+    "EquipmentId": "5304BD92-3813-4EC1-B65C-A5AD1045D027",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:50:38.74",
+    "ModifiedOnUTC": "2024-04-23T11:50:38.74"
+  },
+  {
+    "Id": "46031650-5549-45d2-b732-520e3b8d0aaa",
+    "EquipmentId": "CA3C1425-6774-497C-B5BF-1A1194262889",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:57:25.927",
+    "ModifiedOnUTC": "2024-04-23T11:57:25.927"
+  },
+  {
+    "Id": "5c664d80-808e-4ce2-9493-c36d0fb24a4f",
+    "EquipmentId": "FEDEFAEF-62DB-4A44-A674-A124437BED17",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-18T17:59:54.95",
+    "ModifiedOnUTC": "2024-04-18T17:59:54.95"
+  },
+  {
+    "Id": "64860e5c-b293-44de-a65e-ebd9c8c82ef9",
+    "EquipmentId": "922A4891-1EF7-4F7C-9B41-4661ABDFD9EE",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:51:12.42",
+    "ModifiedOnUTC": "2024-04-23T11:51:12.42"
+  },
+  {
+    "Id": "67a00333-433e-4510-8c39-85fd4206d5b8",
+    "EquipmentId": "235D50BB-C972-4B26-B867-804AA904A847",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-18T17:57:25.977",
+    "ModifiedOnUTC": "2024-04-18T17:57:25.977"
+  },
+  {
+    "Id": "6fb601e5-ccf9-46b3-94aa-68d67f60f89d",
+    "EquipmentId": "43A2F25F-75EE-4002-9D83-8181FB1AC7B0",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:50:18.483",
+    "ModifiedOnUTC": "2024-04-23T11:50:18.483"
+  },
+  {
+    "Id": "719e2204-3e02-47a8-9195-75d5058b66b7",
+    "EquipmentId": "3A26D5E0-32FA-4BAE-8521-91C4686FB9C6",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:56:55.173",
+    "ModifiedOnUTC": "2024-04-23T11:56:55.173"
+  },
+  {
+    "Id": "750e5b65-700b-4a4d-af00-b597f43e6b6f",
+    "EquipmentId": "952C40A9-BC18-4943-AE66-75CB62F824AF",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:51:21.063",
+    "ModifiedOnUTC": "2024-04-23T11:51:21.063"
+  },
+  {
+    "Id": "80e971b3-ee99-42c0-bea9-1b44d3203719",
+    "EquipmentId": "E4C81ED0-23AA-4FF2-BC35-014A64CF20BE",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:51:55.22",
+    "ModifiedOnUTC": "2024-04-23T11:51:55.22"
+  },
+  {
+    "Id": "83d55b86-cdbc-4aee-810e-d0afa4e3f456",
+    "EquipmentId": "29EDFCB6-1DE1-4C41-A8A3-D789A64A756D",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-18T17:57:48.54",
+    "ModifiedOnUTC": "2024-04-18T17:57:48.54"
+  },
+  {
+    "Id": "8d2eeadf-bec8-4609-877c-d23abd626340",
+    "EquipmentId": "942F4B34-4110-4BB8-88AE-2D8442CE8BE4",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-18T17:59:07.447",
+    "ModifiedOnUTC": "2024-04-18T17:59:07.447"
+  },
+  {
+    "Id": "9852dbb2-1eea-44e4-9d2c-d80b7e955374",
+    "EquipmentId": "70E5B268-C839-417F-A9D5-9F3014730D22",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:51:05.933",
+    "ModifiedOnUTC": "2024-04-23T11:51:05.933"
+  },
+  {
+    "Id": "a030c2b9-554c-4e09-ac83-7756f9789369",
+    "EquipmentId": "4CC6D48F-831E-4E84-9A9C-0A91C549049E",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:50:54.82",
+    "ModifiedOnUTC": "2024-04-23T11:50:54.82"
+  },
+  {
+    "Id": "a0c3f50a-1ec8-47e9-a98a-14096ef032a2",
+    "EquipmentId": "43F0167E-A509-4863-8DD6-1060921E52ED",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-22T16:47:29.323",
+    "ModifiedOnUTC": "2024-04-22T16:47:29.323"
+  },
+  {
+    "Id": "a36db515-9675-4134-8e11-798d2a4c28f4",
+    "EquipmentId": "E1B2D0BA-B179-41F6-96E5-D38883AF5484",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-22T16:49:15.373",
+    "ModifiedOnUTC": "2024-04-22T16:49:15.373"
+  },
+  {
+    "Id": "abecba9c-2b8f-4e38-a030-cbfbaa39a428",
+    "EquipmentId": "05BDDA97-FA19-4D5E-BC74-A90EA9F7231E",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-22T16:51:28.987",
+    "ModifiedOnUTC": "2024-04-22T16:51:28.987"
+  },
+  {
+    "Id": "b9cd563f-c5b8-4737-bc00-d6f0c839daeb",
+    "EquipmentId": "7BFD8512-B2CC-4BE6-A93A-83B264FC19E4",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:57:07.383",
+    "ModifiedOnUTC": "2024-04-23T11:57:07.383"
+  },
+  {
+    "Id": "c10323b7-ac7a-4b1e-afdd-cbd14a974057",
+    "EquipmentId": "D2CB3B43-5110-4956-BB09-EDD8EE54C179",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-22T16:54:51.697",
+    "ModifiedOnUTC": "2024-04-22T16:54:51.697"
+  },
+  {
+    "Id": "d64ce702-eb68-4595-880c-773691264007",
+    "EquipmentId": "1202041B-991C-45BD-9509-B114B9145BD5",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:56:40.633",
+    "ModifiedOnUTC": "2024-04-23T11:56:40.633"
+  },
+  {
+    "Id": "df40af90-b810-46df-ad60-9ab8aa3fedc1",
+    "EquipmentId": "952C40A9-BC18-4943-AE66-75CB62F824AF",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:51:21.063",
+    "ModifiedOnUTC": "2024-04-23T11:51:21.063"
+  },
+  {
+    "Id": "e1d89cec-09b5-4cdb-8720-97a4ec3f3d1e",
+    "EquipmentId": "AD43C87E-BE35-4D93-A7B8-D63878799708",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-22T16:50:09.143",
+    "ModifiedOnUTC": "2024-04-22T16:50:09.143"
+  },
+  {
+    "Id": "e2c92e78-b8e0-4e3a-a80e-80839d60fa02",
+    "EquipmentId": "CBC19279-B647-4713-918C-18ADB8E63B2E",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-22T16:53:11.377",
+    "ModifiedOnUTC": "2024-04-22T16:53:11.377"
+  },
+  {
+    "Id": "e335ef1b-0277-4d6c-a174-6d37e1442542",
+    "EquipmentId": "CAAD5C49-E6CA-49D6-8BF6-69DA70F2F602",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:51:49.51",
+    "ModifiedOnUTC": "2024-04-23T11:51:49.51"
+  },
+  {
+    "Id": "ea0c851a-d8a1-4ec4-8f78-2e5a92d9f9dc",
+    "EquipmentId": "5BBB896B-767A-48B4-9FDA-349361FCD18A",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-06-24T14:26:06.193",
+    "ModifiedOnUTC": "2024-06-24T14:26:06.193"
+  },
+  {
+    "Id": "eb7ff5a2-994a-4161-b733-babb19350ad7",
+    "EquipmentId": "73662D1D-E5DC-4684-B321-7D2E6BF69518",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:57:00.283",
+    "ModifiedOnUTC": "2024-04-23T11:57:00.283"
+  },
+  {
+    "Id": "ec5972d7-e2a7-467a-8cd6-fd522511f7a5",
+    "EquipmentId": "E4F31979-9A4C-4FCD-BFDF-57B997798145",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-22T16:53:19.847",
+    "ModifiedOnUTC": "2024-04-22T16:53:19.847"
+  },
+  {
+    "Id": "fbf2fc37-b15e-4014-bba0-4c9e055f2fc8",
+    "EquipmentId": "03BBD2A1-3608-44D7-97D1-AADBE2CA2546",
+    "ValueStreamId": "953ca273-667b-4c57-aa45-56b35b33a668",
+    "CreatedOnUTC": "2024-04-23T11:57:46.147",
+    "ModifiedOnUTC": "2024-04-23T11:57:46.147"
+  },
+  {
+    "Id": "fcf63d2b-c5a4-4ccd-9cd5-d7bf21abd487",
+    "EquipmentId": "4CC6D48F-831E-4E84-9A9C-0A91C549049E",
+    "ValueStreamId": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+    "CreatedOnUTC": "2024-04-23T11:50:54.82",
+    "ModifiedOnUTC": "2024-04-23T11:50:54.82"
+  }
+]

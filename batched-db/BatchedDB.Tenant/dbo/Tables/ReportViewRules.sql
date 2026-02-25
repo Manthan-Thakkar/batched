@@ -1,0 +1,10 @@
+﻿CREATE TABLE ReportViewRules(
+	[Id] VARCHAR(36)  PRIMARY KEY NOT NULL,
+	[Name] [varchar](300) NOT NULL,
+	[ReportViewId] VARCHAR(36) FOREIGN KEY REFERENCES  ReportView(Id),
+	[Sequence] SMALLINT NOT NULL, 
+	[RuleJSON] NVARCHAR(MAX) NOT NULL,
+	[IsEnabled] BIT NOT NULL DEFAULT 1,
+	[CreatedOn] DATETIME,
+	[ModifiedOn] DATETIME
+)

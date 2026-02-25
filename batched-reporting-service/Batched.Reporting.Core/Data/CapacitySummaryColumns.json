@@ -1,0 +1,62 @@
+[
+  {
+    "FieldName": "facility",
+    "DisplayName": "Facility"
+  },
+  {
+    "FieldName": "valueStream",
+    "DisplayName": "ValueStream"
+  },
+  {
+    "FieldName": "workcenter",
+    "DisplayName": "Workcenter"
+  },
+  {
+    "FieldName": "equipment",
+    "DisplayName": "Equipment"
+  },
+  {
+    "FieldName": "totalTickets",
+    "DisplayName": "Total Tickets"
+  },
+  {
+    "FieldName": "ticketDemand",
+    "DisplayName": "Ticket Demand"
+  },
+  {
+    "FieldName": "reservedDemand",
+    "DisplayName": "Reserved Demand"
+  },
+  {
+    "FieldName": "totalDemand",
+    "DisplayName": "Total Demand"
+  },
+  {
+    "FieldName": "downTimeHolidays",
+    "DisplayName": "Planned Downtime"
+  },
+  {
+    "FieldName": "unplannedAllowance",
+    "DisplayName": "Unplanned Downtime Allowance"
+  },
+  {
+    "FieldName": "totalCapacity",
+    "DisplayName": "Total Capacity"
+  },
+  {
+    "FieldName": "availableCapacity",
+    "DisplayName": "Available Capacity"
+  },
+  {
+    "FieldName": "actualLeadTimeDays",
+    "DisplayName": "Actual Lead Time"
+  },
+  {
+    "FieldName": "externalLeadTimeDays",
+    "DisplayName": "External Lead Time"
+  },
+  {
+    "FieldName": "nextAvailableDate",
+    "DisplayName": "Actual Next Available Date"
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "Id": "2ad76747-4128-46db-b107-b535b1844640",
+    "WorkcenterTypeId": "bc710192-c879-4511-a15c-856c8e2ccb51",
+    "StagingRequirementId": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+    "CreatedOnUTC": "2024-07-08T12:02:30.03",
+    "ModifiedOnUTC": "2024-07-08T12:02:30.03"
+  },
+  {
+    "Id": "650eeac3-6cd0-4b66-8793-3939af41610c",
+    "WorkcenterTypeId": "ead00d5d-4948-438c-86c1-e84acdce7349",
+    "StagingRequirementId": "1703073B-7A7D-48EF-A20D-2C7707F6B7DF",
+    "CreatedOnUTC": "2024-07-08T12:02:49.603",
+    "ModifiedOnUTC": "2024-07-08T12:02:49.603"
+  },
+  {
+    "Id": "6b9f145c-acc4-4732-8316-d98eeb664b90",
+    "WorkcenterTypeId": "ead00d5d-4948-438c-86c1-e84acdce7349",
+    "StagingRequirementId": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+    "CreatedOnUTC": "2024-07-08T12:02:49.603",
+    "ModifiedOnUTC": "2024-07-08T12:02:49.603"
+  },
+  {
+    "Id": "721dc88e-3b5f-49a9-811c-ee0a61994db8",
+    "WorkcenterTypeId": "bc710192-c879-4511-a15c-856c8e2ccb51",
+    "StagingRequirementId": "598832BA-4541-410D-9289-1557F72CBC9F",
+    "CreatedOnUTC": "2024-07-08T12:02:30.03",
+    "ModifiedOnUTC": "2024-07-08T12:02:30.03"
+  },
+  {
+    "Id": "919d3035-082c-457c-8f5c-33357d639208",
+    "WorkcenterTypeId": "7347e074-d63d-4df8-92dc-d34f2f4f6d38",
+    "StagingRequirementId": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+    "CreatedOnUTC": "2024-04-22T17:45:54.007",
+    "ModifiedOnUTC": "2024-04-22T17:45:54.007"
+  },
+  {
+    "Id": "dc955f08-439a-4a97-933f-81fe3293a137",
+    "WorkcenterTypeId": "adafc799-6fb6-41d0-be45-a7b04ac06a95",
+    "StagingRequirementId": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+    "CreatedOnUTC": "2024-07-08T12:02:14.523",
+    "ModifiedOnUTC": "2024-07-08T12:02:14.523"
+  },
+  {
+    "Id": "e9947066-67b2-445a-8540-178040aa3076",
+    "WorkcenterTypeId": "7347e074-d63d-4df8-92dc-d34f2f4f6d38",
+    "StagingRequirementId": "598832BA-4541-410D-9289-1557F72CBC9F",
+    "CreatedOnUTC": "2024-04-22T17:45:54.007",
+    "ModifiedOnUTC": "2024-04-22T17:45:54.007"
+  },
+  {
+    "Id": "ea74d227-364b-4425-be2e-10816031c9d1",
+    "WorkcenterTypeId": "bc710192-c879-4511-a15c-856c8e2ccb51",
+    "StagingRequirementId": "1703073B-7A7D-48EF-A20D-2C7707F6B7DF",
+    "CreatedOnUTC": "2024-07-08T12:02:30.03",
+    "ModifiedOnUTC": "2024-07-08T12:02:30.03"
+  },
+  {
+    "Id": "fa9b1893-6d91-445d-8139-0b9d802ea989",
+    "WorkcenterTypeId": "da091dd6-dd2f-4afb-b173-311ee8bd9c0f",
+    "StagingRequirementId": "C1FC87A5-C531-4DE5-922B-588897EA3A52",
+    "CreatedOnUTC": "2024-04-22T17:48:01.897",
+    "ModifiedOnUTC": "2024-04-22T17:48:01.897"
+  }
+]

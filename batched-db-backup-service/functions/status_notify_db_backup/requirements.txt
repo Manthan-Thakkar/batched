@@ -1,0 +1,4 @@
+pymsteams==0.2.5
+boto3==1.42.17
+certifi==2025.11.12
+urllib3==2.6.2

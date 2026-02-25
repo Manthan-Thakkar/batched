@@ -1,0 +1,15 @@
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: batched-prod-nodeclass
+spec:
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "amtech-shared-devops-eks-batched-prod"
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "amtech-shared-devops-eks"
+  role: "AmazonEKSAutoNodeRole"
+  tags:
+    team: amtech-devops
+    karpenterNode: 'true'

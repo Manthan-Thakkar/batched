@@ -1,0 +1,15 @@
+﻿CREATE TABLE [dbo].[AuditMaster](
+	[Id] [varchar](36) CONSTRAINT [PK_AuditMaster] PRIMARY KEY  NOT NULL,
+	[TimestampUTC] [datetime] NOT NULL,
+	[AppName] [varchar](50) NOT NULL,
+	[CorrelationId] [varchar](100) NULL,
+	[ActionType] [varchar](10) NOT NULL,
+	[Entity] [varchar](50) NOT NULL,
+	[Context] [varchar](50) NOT NULL,
+	[Description] [varchar](500)  NOT NULL,
+	[UserRole] [varchar](20) NOT NULL,
+	[UserName] [varchar](50) NULL,
+	[IPAddress] [varchar](50) NULL,
+	[IsDisabled] [bit] CONSTRAINT [DF_AuditMaster_IsDisabled]  DEFAULT ((0)) NOT NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedOn] [datetime] NULL);

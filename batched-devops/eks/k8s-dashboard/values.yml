@@ -1,0 +1,7 @@
+app:
+  scheduling:
+    # Node labels for pod assignment
+    # Ref: https://kubernetes.io/docs/user-guide/node-selection/
+    nodeSelector:
+      kubernetes.io/os: linux
+      EKSManaged: 'true'

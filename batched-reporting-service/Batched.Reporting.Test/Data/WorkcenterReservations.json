@@ -1,0 +1,20 @@
+[
+  {
+    "id": "workcenterReservation1",
+    "reservationId": "reservation1",
+    "WorkcenterTypeId": "wc1",
+    "WorkcenterName": "Digital HP",
+    "ReservedHours": 20,
+    "CreatedOnUTC": "2023-08-03T14:39:34.823",
+    "ModifiedOnUTC": "2023-08-03T14:39:34.823"
+  },
+  {
+    "id": "workcenterReservation2",
+    "reservationId": "reservation2",
+    "WorkcenterTypeId": "wc2",
+    "WorkcenterName": "Digicon Finishing",
+    "reservedHours": 5,
+    "CreatedOnUTC": "2023-08-03T14:39:34.823",
+    "ModifiedOnUTC": "2023-08-03T14:39:34.823"
+  }
+]

@@ -1,0 +1,30 @@
+﻿CREATE TABLE [dbo].[ToolingInventory]
+(
+	[Id]					VARCHAR(36),
+	[SourceToolingId]		NVARCHAR(4000),
+	[TenantId]				VARCHAR(36)			NOT NULL,
+	[Source]				VARCHAR(36)			NOT NULL,
+	[DieSize]				REAL				NULL,
+	[GearTeeth]				SMALLINT			NULL,
+	[Location]				NVARCHAR(4000)		NULL,
+	[FlexoHotStamping]		NVARCHAR(4000)		NULL,
+	[SourceCreatedOn]		DATETIME			NULL,
+	[SourceModifiedOn]		DATETIME			NULL,
+	[IsEnabled]				BIT					NOT NULL,
+	[CreatedOn]				DATETIME			NOT NULL,
+	[ModifiedOn]			DATETIME			NOT NULL,
+	[LinerCaliper]			NVARCHAR(4000)		NULL,
+	[Shape]					NVARCHAR(4000)		NULL,
+	[FacilityId]			VARCHAR(36)			NULL,
+	[AvailableQuantity]		REAL				NOT NULL,
+	[ToolType]				VARCHAR(36)			NOT NULL,
+	[ToolDeliveryDate]		DATETIME			NULL,
+	[Pitch]					NVARCHAR(4000)		NULL,
+	[NoAround]				SMALLINT			NULL,
+	[NoAcross]				SMALLINT			NULL,
+	[SizeAcross]			REAL				NULL,
+	[SizeAround]			REAL				NULL,
+	[ToolIn]				BIT					NULL,
+
+    CONSTRAINT [PK_ToolingInventoryID] PRIMARY KEY NONCLUSTERED ([Id])
+);

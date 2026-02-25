@@ -1,0 +1,30 @@
+﻿<Project Sdk="MSBuild.Sdk.SqlProj/2.9.1">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>model-Tenant</AssemblyName>
+	</PropertyGroup>
+  
+	<ItemGroup>
+		<Content Include="../../BatchedDB.Tenant/dbo/*.sql" />
+		<Content Include="../../BatchedDB.Tenant/dbo/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant/dbo/**/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant/dbo/**/**/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant/dbo/**/**/**/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant/dbo/**/**/**/**/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant.Radius/dbo/*.sql" />
+		<Content Include="../../BatchedDB.Tenant.Radius/dbo/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant.Radius/dbo/**/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant.Radius/dbo/**/**/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant.Radius/dbo/**/**/**/**/*.sql" />
+		<Content Include="../../BatchedDB.Tenant.Radius/dbo/**/**/**/**/**/*.sql" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Remove="../../BatchedDB.Tenant/dbo/Scripts/**/*.sql" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PostDeploy Include="../../BatchedDB.Tenant.Radius/PostDeploymentScripts/Script.PostDeployment.sql" />
+	</ItemGroup>
+
+</Project>

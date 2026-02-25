@@ -1,0 +1,10 @@
+[
+  {
+    "ParameterKey": "LambdaSecurityGroupName",
+    "ParameterValue": "LambdaSG"
+  },
+  {
+    "ParameterKey": "BastionHostSecurityGroupName",
+    "ParameterValue": "BastionHostSG"
+  }
+]

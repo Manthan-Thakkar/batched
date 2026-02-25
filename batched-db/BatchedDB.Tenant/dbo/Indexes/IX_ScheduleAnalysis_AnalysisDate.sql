@@ -1,0 +1,1 @@
+﻿CREATE INDEX [IX_ScheduleAnalysis_AnalysisDate] ON [dbo].[ScheduleAnalysis] (AnalysisDate)

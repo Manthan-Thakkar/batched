@@ -1,0 +1,71 @@
+env:
+  - name: FLUENT_ELASTICSEARCH_HOST
+    value: "ip-10-27-48-112.ec2.internal"
+  - name: FLUENT_ELASTICSEARCH_PORT
+    value: "9200"
+  - name: FLUENT_ELASTICSEARCH_USER
+    value: "app_user"
+  - name: FLUENT_ELASTICSEARCH_PASSWD
+    value: "AppUs3r123!"
+config:
+  service: |
+    [SERVICE]
+        Daemon Off
+        Flush {{ .Values.flush }}
+        Log_Level {{ .Values.logLevel }}
+        Parsers_File /fluent-bit/etc/parsers.conf
+        HTTP_Server On
+        HTTP_Listen 0.0.0.0
+        HTTP_Port {{ .Values.metricsPort }}
+        Health_Check On
+
+  ## https://docs.fluentbit.io/manual/pipeline/inputs
+  inputs: |
+    [INPUT]
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*r-scheduler*.log
+        multiline.parser  docker, cri
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     100MB
+        Skip_Long_Lines   Off
+        Refresh_Interval  10
+  ## https://docs.fluentbit.io/manual/pipeline/filters
+  filters: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Merge_Log           On
+        Merge_Log_Key       log_processed
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+        Labels              Off
+        Annotations         Off
+        Buffer_Size         0
+
+  ## https://docs.fluentbit.io/manual/pipeline/outputs
+  outputs: |
+    [OUTPUT]
+        Name              es
+        Index             fluent-bit
+        Match             kube.*
+        Host              ${FLUENT_ELASTICSEARCH_HOST}
+        Port              ${FLUENT_ELASTICSEARCH_PORT}
+        HTTP_User         ${FLUENT_ELASTICSEARCH_USER}
+        HTTP_Passwd       ${FLUENT_ELASTICSEARCH_PASSWD}
+        Logstash_Format   On
+        Logstash_Prefix   r-scheduler
+        Replace_Dots      On
+        Retry_Limit       False
+        Trace_Error       On
+
+  ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/upstream-servers
+  ## This configuration is deprecated, please use `extraFiles` instead.
+  upstream: {}
+
+  ## https://docs.fluentbit.io/manual/pipeline/parsers
+nodeSelector:
+  karpenter.sh/nodepool: r-algo-workload
+
+tolerations: [{"operator":"Exists"}]

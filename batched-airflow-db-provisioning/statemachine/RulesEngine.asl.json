@@ -1,0 +1,984 @@
+{
+    "Comment": "State Machine for Rules Engine Orchestration",
+    "StartAt": "Eval-TicketAttributes",
+    "States": {
+        "Eval-TicketAttributes": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-TicketAttributes"
+        },
+        "Waitfor10Seconds-TicketAttributes": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-TicketAttributes"
+        },
+        "CheckEvalStatus-TicketAttributes": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-TicketAttributes"
+        },
+        "Choice-TicketAttributes": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Next": "Eval-TicketTask",
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS"
+                },
+                {
+                    "Next": "Waitfor10Seconds-TicketAttributes",
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ]
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-TicketTask": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-TicketTask"
+        },
+        "Waitfor10Seconds-TicketTask": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-TicketTask"
+        },
+        "CheckEvalStatus-TicketTask": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice"
+        },
+        "Choice": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-TicketTaskCleanup"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-TicketTask"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-TicketTaskCleanup": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-TicketTaskCleanup"
+        },
+        "Waitfor10Seconds-TicketTaskCleanup": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-TicketTaskCleanup"
+        },
+        "CheckEvalStatus-TicketTaskCleanup": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-TicketTaskCleanup"
+        },
+        "Choice-TicketTaskCleanup": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-Reservations"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-TicketTaskCleanup"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-Reservations": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-Reservations"
+        },
+        "Waitfor10Seconds-Reservations": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-Reservations"
+        },
+        "CheckEvalStatus-Reservations": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-Reservations"
+        },
+        "Choice-Reservations": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-GenerateCylinders"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-Reservations"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "FailedNotification": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${NotifyStatusFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Fail"
+        },
+        "Fail": {
+            "Type": "Fail"
+        },
+        "Eval-GenerateCylinders": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-GenerateCylinders"
+        },
+        "Waitfor10Seconds-GenerateCylinders": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-GenerateCylinders"
+        },
+        "CheckEvalStatus-GenerateCylinders": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-GenerateCylinders"
+        },
+        "Choice-GenerateCylinders": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-StockPlanning"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-GenerateCylinders"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-StockPlanning": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-StockPlanning"
+        },
+        "Waitfor10Seconds-StockPlanning": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-StockPlanning"
+        },
+        "CheckEvalStatus-StockPlanning": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-StockPlanning"
+        },
+        "Choice-StockPlanning": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-TicketStockAttributes"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-StockPlanning"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-TicketStockAttributes": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-TicketStockAttributes"
+        },
+        "Waitfor10Seconds-TicketStockAttributes": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-TicketStockAttributes"
+        },
+        "CheckEvalStatus-TicketStockAttributes": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-TicketStockAttributes"
+        },
+        "Choice-TicketStockAttributes": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-FeasibleRoutes"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-TicketStockAttributes"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-FeasibleRoutes": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-FeasibleRoutes"
+        },
+        "Waitfor10Seconds-FeasibleRoutes": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-FeasibleRoutes"
+        },
+        "CheckEvalStatus-FeasibleRoutes": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-FeasibleRoutes"
+        },
+        "Choice-FeasibleRoutes": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-ReportsData"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-FeasibleRoutes"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-ReportsData": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-ReportsData"
+        },
+        "Waitfor10Seconds-ReportsData": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-ReportsData"
+        },
+        "CheckEvalStatus-ReportsData": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-ReportsData"
+        },
+        "Choice-ReportsData": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "Eval-Changeovers"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-ReportsData"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "Eval-Changeovers": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${RulesEngineEvalFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Waitfor10Seconds-Changeovers"
+        },
+        "Waitfor10Seconds-Changeovers": {
+            "Type": "Wait",
+            "Seconds": 10,
+            "Next": "CheckEvalStatus-Changeovers"
+        },
+        "CheckEvalStatus-Changeovers": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${RulesEngineCheckStatusFunctionArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "FailedNotification"
+                }
+            ],
+            "Next": "Choice-Changeovers"
+        },
+        "Choice-Changeovers": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "SuccessNotification"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        }
+                    ],
+                    "Next": "Waitfor10Seconds-Changeovers"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "FailedNotification"
+                }
+            ]
+        },
+        "SuccessNotification": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${NotifyStatusFunctionArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Success"
+        },
+        "Success": {
+            "Type": "Succeed"
+        }
+    }
+}

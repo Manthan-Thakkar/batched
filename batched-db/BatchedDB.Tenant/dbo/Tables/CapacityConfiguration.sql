@@ -1,0 +1,10 @@
+﻿CREATE TABLE CapacityConfiguration
+(
+Id VARCHAR(36) PRIMARY KEY NOT NULL,
+EquipmentId VARCHAR(36) FOREIGN KEY REFERENCES EquipmentMaster(ID) NOT NULL,
+UnplannedAllowance INT NOT NULL,
+MinLeadTime INT NOT NULL,
+AvailabilityThreshold INT NOT NULL,
+CreatedOnUTC DATETIME NOT NULL,
+ModifiedOnUTC DATETIME NOT NULL
+)

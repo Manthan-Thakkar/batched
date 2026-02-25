@@ -1,0 +1,1 @@
+﻿CREATE INDEX [IX_EquipmentScheduleAnalysis_AnalysisDate] ON [dbo].[EquipmentScheduleAnalysis] (AnalysisDate) INCLUDE (EquipmentId)

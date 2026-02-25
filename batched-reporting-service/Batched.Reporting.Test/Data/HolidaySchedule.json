@@ -1,0 +1,34 @@
+[
+  {
+    "Id": "holiday1",
+    "Name": "New Year",
+    "Date": "2024-01-01 00:00:00.000",
+    "TenantId": "6b52acb0-da22-4db5-96b0-6f330cbe000f",
+    "CreatedOn": "2024-01-01 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  },
+  {
+    "Id": "holiday2",
+    "Name": "Good Friday",
+    "Date": "2024-04-29 00:00:00.000",
+    "TenantId": "6b52acb0-da22-4db5-96b0-6f330cbe000f",
+    "CreatedOn": "2022-11-21 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  },
+  {
+    "Id": "holiday3",
+    "Name": "Christmas",
+    "Date": "2023-12-25 00:00:00.000",
+    "TenantId": "6b52acb0-da22-4db5-96b0-6f330cbe000f",
+    "CreatedOn": "2022-11-21 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  },
+  {
+    "Id": "holiday4",
+    "Name": "holiday4",
+    "Date": "2024-04-30 00:00:00.000",
+    "TenantId": "6b52acb0-da22-4db5-96b0-6f330cbe000f",
+    "CreatedOn": "2022-11-21 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  }
+]

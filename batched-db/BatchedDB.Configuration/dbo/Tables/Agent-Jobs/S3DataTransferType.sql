@@ -1,0 +1,6 @@
+﻿CREATE TABLE [dbo].[S3DataTransferType]
+(
+	[Id] VARCHAR(36) PRIMARY KEY NOT NULL,
+	[TransferType] VARCHAR(50) NOT NULL,
+	[DisplayText] VARCHAR(126) NOT NULL
+)

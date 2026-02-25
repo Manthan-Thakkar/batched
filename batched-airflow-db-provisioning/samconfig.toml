@@ -1,0 +1,8 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "airflow-step-function"
+resolve_s3 = true
+s3_prefix = "airflow-step-function"
+capabilities = "CAPABILITY_IAM"
+disable_rollback = false
+image_repositories = []

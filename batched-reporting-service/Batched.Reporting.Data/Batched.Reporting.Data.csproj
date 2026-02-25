@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Batched.Reporting.Contracts\Batched.Reporting.Contracts.csproj" />
+    <ProjectReference Include="..\Batched.Reporting.Core\Batched.Reporting.Core.csproj" />
+    <ProjectReference Include="..\Batched.Reporting.Shared\Batched.Reporting.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

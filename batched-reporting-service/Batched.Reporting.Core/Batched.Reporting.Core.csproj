@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Data\CapacitySummaryColumns.json" />
+    <None Remove="Data\LeadTimeExceptionsColumns.json" />
+    <None Remove="Data\OpenTicketsColumns.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\CapacitySummaryColumns.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\LeadTimeExceptionsColumns.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\OpenTicketsColumns.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Batched.Reporting.Contracts\Batched.Reporting.Contracts.csproj" />
+    <ProjectReference Include="..\Batched.Reporting.Shared\Batched.Reporting.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

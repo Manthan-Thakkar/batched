@@ -1,0 +1,62 @@
+[
+  {
+    "ParameterKey": "PortNumber",
+    "ParameterValue": "1433"
+  },
+  {
+    "ParameterKey": "AvailabilityZone",
+    "ParameterValue": "us-east-2"
+  },
+  {
+    "ParameterKey": "AllocatedStorage",
+    "ParameterValue": "50"
+  },
+  {
+    "ParameterKey": "MaxAllocatedStorage",
+    "ParameterValue": "1000"
+  },
+  {
+    "ParameterKey": "DBInstanceClass",
+    "ParameterValue": "db.r5.large"
+  },
+  {
+    "ParameterKey": "DBEngine",
+    "ParameterValue": "sqlserver-se"
+  },
+  {
+    "ParameterKey": "MasterUsername",
+    "ParameterValue": "DB_USERNAME"
+  },
+  {
+    "ParameterKey": "MasterUserPassword",
+    "ParameterValue": "DB_PASSWORD"
+  },
+  {
+    "ParameterKey": "StorageType",
+    "ParameterValue": "gp2"
+  },
+  {
+    "ParameterKey": "PreferredBackupWindow",
+    "ParameterValue": "00:00-02:00"
+  },
+  {
+    "ParameterKey": "PreferredMaintenanceWindowStartTime",
+    "ParameterValue": "04:00"
+  },
+  {
+    "ParameterKey": "PreferredMaintenanceWindowDay",
+    "ParameterValue": "Sun"
+  },
+  {
+    "ParameterKey": "PreferredMaintenanceWindowEndTime",
+    "ParameterValue": "06:00"
+  },
+  {
+    "ParameterKey": "PubliclyAccessible",
+    "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "AccessCidr",
+    "ParameterValue": "Access CIDR"
+  }
+]

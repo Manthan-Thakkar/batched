@@ -1,0 +1,70 @@
+
+rdsPassword2 = [
+  development : "batched-development-rds-2-password",
+  production : "batched-production-rds-2-password"
+]
+
+rdsUsername2 = [
+  development : "batched-development-rds-2-username",
+  production : "batched-production-rds-2-username"
+]
+
+dbHostname2 = [
+  development : "dev-db-hostname2",
+  production : "prod-db-hostname2"
+]
+
+pipeline {
+
+  agent any
+
+  parameters {
+    choice(name: 'deploy_to', choices: ['development','production'], description: "Select Environment Name For Deployment")
+
+  }
+  
+  stages {
+
+    stage('Build and Deploy') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword2["${deploy_to}"], , variable: 'DB_PASSWORD2'), string(credentialsId: rdsUsername2["${deploy_to}"], , variable: 'DB_USERNAME2'),string(credentialsId: dbHostname2["${deploy_to}"], , variable: 'DB_TSN2')]) {
+
+          dir("BatchedDB.Tenant.Radius/MigrationBasedBuild/") {
+            sh '''#!/bin/bash
+            
+            dotnet build
+
+            if [ $? -eq 0 ]; then
+                echo "Build is Successful"
+            else
+                echo "Build Failed"
+                exit 1
+            fi
+
+            ~/sqlpackage/sqlpackage /Action:Publish \
+            /SourceFile:./bin/Debug/netstandard2.0/model-Tenant.dacpac \
+            /TargetServerName:${DB_TSN2},1433 \
+            /TargetDatabaseName:${DB_NAME} \
+            /TargetUser:${DB_USERNAME2} \
+            /TargetPassword:${DB_PASSWORD2} \
+            /DeployScriptPath:"./Result-${BUILD_NUMBER}-2.txt" \
+            /p:TreatVerificationErrorsAsWarnings=True \
+            /p:BlockOnPossibleDataLoss=True 
+
+            if [ $? -eq 0 ]; then
+                echo "Build is Successful"
+            else
+                echo "Build Failed"
+                exit 1
+            fi
+
+            sh '''
+          }
+        }
+      }
+    }
+
+
+  }
+
+}

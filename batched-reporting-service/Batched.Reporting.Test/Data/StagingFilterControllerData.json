@@ -1,0 +1,516 @@
+[
+  {
+    "Tickets": [
+      "60008",
+      "60208",
+      "60368",
+      "60007",
+      "60174",
+      "60272",
+      "60361",
+      "60292",
+      "60172",
+      "60171",
+      "60360",
+      "60328",
+      "60315",
+      "60381",
+      "60359",
+      "60006",
+      "60269",
+      "60207",
+      "60319",
+      "60173",
+      "59834",
+      "60296",
+      "60131",
+      "60316"
+    ],
+    "StagingRequirements": [
+      {
+        "Id": "C1FC87A5-C531-4DE5-922B-588897EA3A52",
+        "Name": "Cores"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "da091dd6-dd2f-4afb-b173-311ee8bd9c0f",
+    "WorkcenterName": "Rewinder",
+    "EquipmentId": "235D50BB-C972-4B26-B867-804AA904A847",
+    "EquipmentName": "11"
+  },
+  {
+    "Tickets": [
+      "60347",
+      "60267",
+      "60232",
+      "60189",
+      "60228",
+      "59411",
+      "60332",
+      "59159",
+      "60311"
+    ],
+    "StagingRequirements": [
+      {
+        "Id": "C1FC87A5-C531-4DE5-922B-588897EA3A52",
+        "Name": "Cores"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "da091dd6-dd2f-4afb-b173-311ee8bd9c0f",
+    "WorkcenterName": "Rewinder",
+    "EquipmentId": "29EDFCB6-1DE1-4C41-A8A3-D789A64A756D",
+    "EquipmentName": "12B"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d51f5d87-8291-4d2a-addb-a37093f51fb4",
+    "WorkcenterName": "Digicon Finishing",
+    "EquipmentId": "4C571EFE-405D-4A8A-BA0D-063A0645F9AC",
+    "EquipmentName": "26"
+  },
+  {
+    "Tickets": [
+      "59106",
+      "60191",
+      "59160",
+      "60234",
+      "59838",
+      "60235",
+      "59835",
+      "60105",
+      "60263",
+      "60303",
+      "60190",
+      "60226",
+      "60180",
+      "59156",
+      "59836",
+      "60260",
+      "60358",
+      "60384",
+      "60320",
+      "59410",
+      "60200",
+      "60300",
+      "60179",
+      "60341",
+      "60253",
+      "60298",
+      "60379",
+      "60342",
+      "60307"
+    ],
+    "StagingRequirements": [
+      {
+        "Id": "C1FC87A5-C531-4DE5-922B-588897EA3A52",
+        "Name": "Cores"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      },
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "da091dd6-dd2f-4afb-b173-311ee8bd9c0f",
+    "WorkcenterName": "Rewinder",
+    "EquipmentId": "4CC6D48F-831E-4E84-9A9C-0A91C549049E",
+    "EquipmentName": "12"
+  },
+  {
+    "Tickets": [
+      "60197",
+      "60368",
+      "60239",
+      "60323",
+      "60334",
+      "59134",
+      "60140"
+    ],
+    "StagingRequirements": [
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "adafc799-6fb6-41d0-be45-a7b04ac06a95",
+    "WorkcenterName": "Blank Label Press",
+    "EquipmentId": "5BBB896B-767A-48B4-9FDA-349361FCD18A",
+    "EquipmentName": "5X"
+  },
+  {
+    "Tickets": [
+      "60372",
+      "60269",
+      "59411",
+      "60340",
+      "60105",
+      "60182",
+      "60344",
+      "60162",
+      "60347",
+      "59985",
+      "60219",
+      "60307",
+      "59156",
+      "60332",
+      "60252",
+      "60180",
+      "60287",
+      "59836",
+      "60181",
+      "60227",
+      "60285",
+      "60254",
+      "59159",
+      "60089",
+      "59160",
+      "60292",
+      "60356",
+      "60179",
+      "60294",
+      "60337",
+      "60362",
+      "60339",
+      "60342",
+      "59410",
+      "60286",
+      "60335",
+      "60333",
+      "60253",
+      "60199",
+      "60311",
+      "60267"
+    ],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "8dbb8703-38c2-49f5-aa08-bc441e0fbb28",
+    "WorkcenterName": "Digital HP",
+    "EquipmentId": "78883DD5-CD13-4AD0-A8F1-3418BAB89C5B",
+    "EquipmentName": "1"
+  },
+  {
+    "Tickets": [
+      "60275",
+      "60361",
+      "60203"
+    ],
+    "StagingRequirements": [
+      {
+        "Id": "1703073B-7A7D-48EF-A20D-2C7707F6B7DF",
+        "Name": "Inks"
+      },
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "ead00d5d-4948-438c-86c1-e84acdce7349",
+    "WorkcenterName": "Flexo Press",
+    "EquipmentId": "942F4B34-4110-4BB8-88AE-2D8442CE8BE4",
+    "EquipmentName": "2"
+  },
+  {
+    "Tickets": [
+      "60208",
+      "60174",
+      "60296",
+      "60381",
+      "60047",
+      "60360",
+      "60172",
+      "60173",
+      "60051",
+      "60171",
+      "60328",
+      "60319",
+      "59834",
+      "60359",
+      "60207"
+    ],
+    "StagingRequirements": [
+      {
+        "Id": "1703073B-7A7D-48EF-A20D-2C7707F6B7DF",
+        "Name": "Inks"
+      },
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      },
+      {
+        "Id": "598832BA-4541-410D-9289-1557F72CBC9F",
+        "Name": "Art Proofs"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      },
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "bc710192-c879-4511-a15c-856c8e2ccb51",
+    "WorkcenterName": "Hybrid Press",
+    "EquipmentId": "AD43C87E-BE35-4D93-A7B8-D63878799708",
+    "EquipmentName": "3X"
+  },
+  {
+    "Tickets": [],
+    "StagingRequirements": [
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "adafc799-6fb6-41d0-be45-a7b04ac06a95",
+    "WorkcenterName": "Blank Label Press",
+    "EquipmentId": "B8A5C5C6-9ACA-4671-914F-A567C7FC62B7",
+    "EquipmentName": "16"
+  },
+  {
+    "Tickets": [
+      "59159",
+      "60344",
+      "60269",
+      "60294",
+      "60352",
+      "60356",
+      "60255",
+      "60335",
+      "60340",
+      "60227",
+      "59869",
+      "60338",
+      "60339",
+      "60342",
+      "60290",
+      "60353",
+      "60383",
+      "60288",
+      "60337",
+      "60286",
+      "60287",
+      "60055",
+      "60180",
+      "58167",
+      "60318",
+      "60366",
+      "60219",
+      "60237",
+      "60254",
+      "60351",
+      "60252",
+      "60267",
+      "60285",
+      "60362",
+      "60340",
+      "59411",
+      "60372",
+      "60089",
+      "60182",
+      "60199",
+      "60350",
+      "60254",
+      "60310",
+      "59985",
+      "60162",
+      "60198",
+      "60280"
+    ],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d51f5d87-8291-4d2a-addb-a37093f51fb4",
+    "WorkcenterName": "Digicon Finishing",
+    "EquipmentId": "CBC19279-B647-4713-918C-18ADB8E63B2E",
+    "EquipmentName": "7"
+  },
+  {
+    "Tickets": [
+      "59106",
+      "59410",
+      "60105",
+      "59156",
+      "60253",
+      "59616",
+      "60194",
+      "60311",
+      "60278",
+      "60252",
+      "60292",
+      "59488",
+      "60307",
+      "60179",
+      "60332",
+      "60347",
+      "59836",
+      "60333",
+      "59160",
+      "60376",
+      "60181",
+      "60279"
+    ],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d51f5d87-8291-4d2a-addb-a37093f51fb4",
+    "WorkcenterName": "Digicon Finishing",
+    "EquipmentId": "D2CB3B43-5110-4956-BB09-EDD8EE54C179",
+    "EquipmentName": "10"
+  },
+  {
+    "Tickets": [
+      "59985",
+      "60379",
+      "60320",
+      "60288",
+      "60232",
+      "60263",
+      "60288",
+      "60298",
+      "60290",
+      "60223",
+      "60226",
+      "60200",
+      "60190",
+      "60238",
+      "60191",
+      "60223",
+      "60358",
+      "60189",
+      "60384",
+      "60300",
+      "60303",
+      "60260",
+      "60341",
+      "60235"
+    ],
+    "StagingRequirements": [
+      {
+        "Id": "350DAC71-FD05-4B6F-AFDB-83C874084C1C",
+        "Name": "Substrates"
+      },
+      {
+        "Id": "598832BA-4541-410D-9289-1557F72CBC9F",
+        "Name": "Art Proofs"
+      }
+    ],
+    "ValueStreams": [
+      {
+        "Id": "953ca273-667b-4c57-aa45-56b35b33a668",
+        "Name": "digital"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "7347e074-d63d-4df8-92dc-d34f2f4f6d38",
+    "WorkcenterName": "Digital Inkjet",
+    "EquipmentId": "E4F31979-9A4C-4FCD-BFDF-57B997798145",
+    "EquipmentName": "6"
+  },
+  {
+    "Tickets": [
+      "60199",
+      "60290",
+      "60203",
+      "60047",
+      "59985",
+      "60238",
+      "60051",
+      "59970",
+      "60223",
+      "60288"
+    ],
+    "StagingRequirements": [],
+    "ValueStreams": [
+      {
+        "Id": "af11c954-d8c8-47cd-9ed1-3ba146259683",
+        "Name": "Flexo"
+      }
+    ],
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "FacilityName": "Demo Facility",
+    "WorkcenterId": "d7f13a9c-6f8b-4951-9584-40f09f747f65",
+    "WorkcenterName": "Sheeter",
+    "EquipmentId": "FEDEFAEF-62DB-4A44-A674-A124437BED17",
+    "EquipmentName": "14"
+  }
+]

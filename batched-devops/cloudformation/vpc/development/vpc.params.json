@@ -1,0 +1,46 @@
+[{
+    "ParameterKey": "VpcCidr",
+    "ParameterValue": "10.18.0.0/16"
+  },
+  {
+    "ParameterKey": "PublicSubnetOneCidr",
+    "ParameterValue": "10.18.0.0/20"
+  },
+  {
+    "ParameterKey": "PublicSubnetTwoCidr",
+    "ParameterValue": "10.18.16.0/20"
+  }
+  ,
+  {
+    "ParameterKey": "PublicSubnetThreeCidr",
+    "ParameterValue": "10.18.32.0/20"
+  },
+  {
+    "ParameterKey": "PrivateSubnetOneCidr",
+    "ParameterValue": "10.18.48.0/20"
+  },
+  {
+    "ParameterKey": "PrivateSubnetTwoCidr",
+    "ParameterValue": "10.18.64.0/20"
+  }
+  ,
+  {
+    "ParameterKey": "PrivateSubnetThreeCidr",
+    "ParameterValue": "10.18.80.0/20"
+  }
+  ,
+  {
+    "ParameterKey": "PrivateSubnetFourCidr",
+    "ParameterValue": "10.18.96.0/20"
+  }
+  ,
+  {
+    "ParameterKey": "PrivateSubnetFiveCidr",
+    "ParameterValue": "10.18.112.0/20"
+  }
+  ,
+  {
+    "ParameterKey": "PrivateSubnetSixCidr",
+    "ParameterValue": "10.18.128.0/20"
+  }
+]

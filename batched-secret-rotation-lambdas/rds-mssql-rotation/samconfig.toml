@@ -1,0 +1,7 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "rds-mssql-rotation"
+resolve_s3 = true
+s3_prefix = "rds-mssql-rotation"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

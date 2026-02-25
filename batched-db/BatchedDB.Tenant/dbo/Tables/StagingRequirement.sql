@@ -1,0 +1,6 @@
+﻿CREATE TABLE StagingRequirement(
+  Id					VARCHAR(36) PRIMARY KEY NOT NULL,
+  Name					NVARCHAR(255) NOT NULL,
+  CreatedOnUTC			DATETIME,
+  ModifiedOnUTC			DATETIME
+)

@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cloudformation to deploy Security Group'
+Parameters:
+    LambdaSecurityGroupName:
+        Description: The name of the Lambda Security Group
+        Type: String
+        Default: LambdaSG
+    BastionHostSecurityGroupName:
+        Description: The name of the BastionHost Security Group
+        Type: String
+
+Resources:
+    LambdaSG:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Security Group for Lambda
+            GroupName:
+                Ref: LambdaSecurityGroupName
+            VpcId:
+                Fn::ImportValue: VirtualPrivateCloud
+            SecurityGroupIngress:
+              - IpProtocol: tcp
+                FromPort: '22'
+                ToPort: '22'
+                CidrIp: 0.0.0.0/0
+            SecurityGroupEgress:
+              - IpProtocol: -1
+                CidrIp: 0.0.0.0/0
+    BastionHostSG:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Security Group for BastionHost
+            GroupName:
+                Ref: BastionHostSecurityGroupName
+            VpcId:
+                Fn::ImportValue: VirtualPrivateCloud
+            SecurityGroupIngress:
+            - IpProtocol: tcp
+              FromPort: '22'
+              ToPort: '22'
+              CidrIp: 0.0.0.0/0
+    RDSSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Allow Client connections to Database 
+            GroupName: RDS security group
+            VpcId:
+              Fn::ImportValue: VirtualPrivateCloud
+            SecurityGroupIngress:
+            - IpProtocol: tcp
+              FromPort: '1433'
+              ToPort: '1433'
+              SourceSecurityGroupId: !GetAtt LambdaSG.GroupId
+            SecurityGroupEgress:
+            - IpProtocol: '-1'
+              FromPort: '-1'
+              ToPort: '-1'
+              CidrIp: 0.0.0.0/0
+    EFSSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: EFS security group
+            GroupName: EFS security group
+            VpcId:
+              Fn::ImportValue: VirtualPrivateCloud
+            SecurityGroupIngress:
+            - IpProtocol: '-1'
+              FromPort: '-1'
+              ToPort: '-1'
+              CidrIp: 0.0.0.0/0 
+            SecurityGroupEgress:
+            - IpProtocol: '-1'
+              FromPort: '-1'
+              ToPort: '-1'
+              CidrIp: 0.0.0.0/0           
+    RAlgorithmSG:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Security Group for RAlgorithm EC2 instance.
+            GroupName: R-Algorithm security group
+            VpcId:
+              Fn::ImportValue: VirtualPrivateCloud
+            SecurityGroupIngress:
+              - IpProtocol: tcp
+                FromPort: '3389'
+                ToPort: '3389'
+                SourceSecurityGroupId: !GetAtt BastionHostSG.GroupId
+            SecurityGroupEgress:
+              - IpProtocol: tcp
+                FromPort: '1433'
+                ToPort: '1433'
+                SourceSecurityGroupId: !GetAtt RDSSecurityGroup.GroupId
+
+Outputs:
+    LambdaSecurityGroupId:
+        Description: This is the Security Group ID for Lambda.
+        Value:
+            Fn::GetAtt: LambdaSG.GroupId
+        Export:
+            Name: LambdaSecurityGroupId
+    RdsSecurityGroupName:
+        Description: This is the Security Group ID for RDS.
+        Value:
+            Fn::GetAtt: RDSSecurityGroup.GroupId
+        Export:
+            Name: RDSSecurityGroup
+    EfsSecurityGroupId:
+        Description: This is the Security Group ID for EFS.
+        Value:
+            Fn::GetAtt: EFSSecurityGroup.GroupId
+        Export:
+            Name: EfsSecurityGroupId                      
+    RASecurityGroupId:
+        Description: This is the Security Group ID for Lambda.
+        Value:
+            Fn::GetAtt: RAlgorithmSG.GroupId
+        Export:
+            Name: RASecurityGroupId

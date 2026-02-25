@@ -1,0 +1,18 @@
+﻿CREATE TABLE StockAvailabilityConfiguration(
+  ID						VARCHAR(36)  PRIMARY KEY NOT NULL,
+  TenantId					VARCHAR(36) NOT NULL,
+  FacilityId				VARCHAR(36) NOT NULL,
+  IsEnabled					BIT NOT NULL,
+  AllowStockSubstitue		BIT NOT NULL,
+  WasteToleranceLimit		REAL NOT NULL,
+  BufferTimeMinutes			REAL NOT NULL,
+  StockInCriteria			VARCHAR(100) NOT NULL,
+  IsTaskLevelStockStatus	BIT NOT NULL DEFAULT 0, 
+  WidthWasteLimit			REAL NULL,
+  LengthWasteLimit			REAL NULL,
+  WasteThresholdUnit		VARCHAR(255) NULL,
+  MaxAllowedWidth			REAL NULL,
+  MaxAllowedLength			REAL NULL,
+  CreatedOnUTC				DATETIME NOT NULL,
+  ModifiedOnUTC				DATETIME NOT NULL,
+  );

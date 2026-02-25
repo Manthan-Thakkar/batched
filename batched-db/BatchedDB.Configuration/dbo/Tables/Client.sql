@@ -1,0 +1,18 @@
+﻿CREATE TABLE [dbo].[Client](
+    [ID]                VARCHAR     (36)    CONSTRAINT [PK_ClientId] PRIMARY KEY,
+    [Name]              [nvarchar]  (64)    NULL CONSTRAINT AK_Client_Name UNIQUE ([Name]),
+    [DisplayName]       [nvarchar]  (20)    NULL CONSTRAINT AK_Client_DisplayName UNIQUE ([DisplayName]),
+    [Subdomain]         [nvarchar]  (16)    NULL CONSTRAINT AK_Client_Subdomain UNIQUE ([Subdomain]),
+    [Address]           [nvarchar]  (128)   NULL,
+    [City]              [nvarchar]  (64)    NULL,
+    [StateOrProvince]   [nvarchar]  (64)    NULL,
+    [ZipCode]           [nvarchar]  (16)    NULL,
+    [CountryCode]       [nvarchar]  (2)     NULL,
+    [LogoUrl]           [nvarchar]  (255)   NULL,
+    [IsEnabled]         [bit]               NOT NULL,
+    [PrimaryColor]      [nvarchar]  (25)    NULL,
+    [SecondaryColor]    [nvarchar]  (25)    NULL,
+    [TertiaryColor]     [nvarchar]  (25)    NULL,
+    [UseSharedInstance]  [bit]               NOT NULL DEFAULT (1),
+    [CreatedOn]         [datetime]          NULL,
+    [ModifiedOn]        [datetime]          NULL)

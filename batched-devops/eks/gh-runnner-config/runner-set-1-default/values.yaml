@@ -1,0 +1,46 @@
+## githubConfigUrl is the GitHub url for where you want to configure runners
+## ex: https://github.com/myorg/myrepo or https://github.com/myorg
+githubConfigUrl: "https://github.com/LabelTraxx"
+
+githubConfigSecret: github-app-secret
+
+## maxRunners is the max number of runners the autoscaling runner set will scale up to.
+maxRunners: 10
+
+## minRunners is the min number of idle runners. The target number of runners created will be
+## calculated as a sum of minRunners and the number of jobs assigned to the scale set.
+minRunners: 0
+
+# runnerGroup: "default"
+
+## name of the runner scale set to create.  Defaults to the helm release name
+runnerScaleSetName: "default-runner"
+
+containerMode:
+  type: "dind"  ## type can be set to dind or kubernetes
+listenerTemplate:
+  spec:
+    containers:
+    - name: listener
+    nodeSelector:
+      karpenter.sh/nodepool: ondemand-nodepool
+    tolerations:
+      - key: "karpenter.sh/nodepool"
+        operator: "Exists"
+        effect: "NoExecute"
+template:
+  spec:
+    containers:
+      - name: runner
+        image: 904233086993.dkr.ecr.us-east-1.amazonaws.com/actions-runner:2.322.0
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            memory: "8000Mi"
+            cpu: "4"
+    nodeSelector:
+      karpenter.sh/nodepool: default-nodepool
+    tolerations:
+      - key: "karpenter.sh/nodepool"
+        operator: "Exists"
+        effect: "NoExecute"

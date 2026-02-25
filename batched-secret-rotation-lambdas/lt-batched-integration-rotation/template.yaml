@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Rotate LTDW & LTCloudAPI Secrets in Batched Account
+
+Resources:
+  LTDWSecretsRotationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LTDW-Secrets-Rotation-Batched
+      Description: Rotate LTDW Secrets in Batched Account
+      CodeUri: src/LTDW-Secrets-Rotation/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Timeout: 30
+      MemorySize: 128
+      Architectures:
+        - x86_64
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:*"
+          - "cloudwatch:*"
+          Resource:
+          - "*"
+      Environment:
+        Variables:
+          API_BASE: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/datawarehouse-endpoint}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds3}}'
+  RotationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LTDWSecretsRotationFunction
+      Action: lambda:InvokeFunction
+      Principal: secretsmanager.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*
+  RotationLambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${LTDWSecretsRotationFunction}-ErrorAlarm"
+      AlarmDescription: "Alarm for Lambda failures"
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref LTDWSecretsRotationFunction
+      Statistic: Sum
+      Period: 86400
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:SecretManagerRotationLambdaError"
+  LTCloudAPITokenSecretsRotationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: LTCloudAPI-Secrets-Rotation-Batched
+      CodeUri: src/LTCloudAPI-Secrets-Rotation/
+      Description: Rotate LTCloud API Token Secrets in Batched Account
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Timeout: 30
+      MemorySize: 128
+      Architectures:
+        - x86_64
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:*"
+          - "cloudwatch:*"
+          Resource:
+          - "*"
+      Environment:
+        Variables:
+          API_BASE: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/datawarehouse-endpoint}}'
+          CLOUD_API_BASE: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/lt-cloudapi-endpoint}}'
+          DB_CONNECTION_SECRET: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/rds_secret_name}}'
+      Layers:
+        - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/PyODBC-Layer-Arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds3}}'
+  LTCloudAPIRotationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LTCloudAPITokenSecretsRotationFunction
+      Action: lambda:InvokeFunction
+      Principal: secretsmanager.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*
+  LTCloudAPIRotationLambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${LTCloudAPITokenSecretsRotationFunction}-ErrorAlarm"
+      AlarmDescription: "Alarm for Lambda failures"
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref LTCloudAPITokenSecretsRotationFunction
+      Statistic: Sum
+      Period: 86400
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:SecretManagerRotationLambdaError"

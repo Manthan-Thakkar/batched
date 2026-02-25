@@ -1,0 +1,9 @@
+﻿CREATE TABLE ClientUser(
+  [ID]			  VARCHAR(36) NOT NULL,
+  [ClientId]      VARCHAR(36) CONSTRAINT [FK_ClientUser_ClientId] FOREIGN KEY REFERENCES Client(ID),
+  [UserId]        VARCHAR(36) CONSTRAINT [FK_ClientUser_UserAccountsId] FOREIGN KEY REFERENCES UserAccounts(Id),
+  [CreatedOn]     DATETIME,
+  [ModifiedOn]    DATETIME
+  CONSTRAINT USP_CSUSR UNIQUE (UserId),
+  CONSTRAINT [PK_ClientUserID] PRIMARY KEY NONCLUSTERED ([ID] ASC)
+);

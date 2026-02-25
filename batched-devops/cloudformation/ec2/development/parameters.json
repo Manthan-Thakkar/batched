@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "AmiId",
+    "ParameterValue": "ami-0f099ab7af4248567"
+  },
+  {
+    "ParameterKey": "InstanceType",
+    "ParameterValue": "t3.xlarge"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "batched-ralgorithm"
+  },
+  {
+    "ParameterKey": "AttachIamRole",
+    "ParameterValue": "false"
+  },
+  {
+    "ParameterKey": "InstanceProfile",
+    "ParameterValue": ""
+  }
+]

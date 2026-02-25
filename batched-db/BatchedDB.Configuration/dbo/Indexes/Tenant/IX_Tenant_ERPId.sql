@@ -1,0 +1,4 @@
+﻿CREATE NONCLUSTERED INDEX [IX_Tenant_ERPId] ON Tenant
+	(
+		ERPId
+	)

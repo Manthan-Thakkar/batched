@@ -1,0 +1,9 @@
+﻿CREATE TABLE FacilityUser
+(
+  ID			VARCHAR(36) CONSTRAINT [PK_FacilityUserID] PRIMARY KEY NOT NULL,
+  FacilityId	VARCHAR(36) CONSTRAINT [FK_FacilityUser_FacilityId]  FOREIGN KEY REFERENCES Facility(Id) NOT NULL,
+  UserId		VARCHAR(36) CONSTRAINT [FK_FacilityUser_UserAccountsId] FOREIGN KEY REFERENCES UserAccounts(Id) NOT NULL,
+  CreatedOn		DATETIME NOT NULL,
+  ModifiedOn	DATETIME
+  CONSTRAINT [AK_FacilityUser_UserId_FacilityId] UNIQUE NONCLUSTERED (UserId ASC, FacilityId ASC)	
+)

@@ -1,0 +1,5 @@
+﻿CREATE TABLE [dbo].[List_4D] (
+	[ID] INT NULL,
+	[GroupName] NVARCHAR(4000) NULL,
+	[Name] NVARCHAR(4000) NULL
+);

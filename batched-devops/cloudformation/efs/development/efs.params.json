@@ -1,0 +1,6 @@
+[
+  {
+    "ParameterKey": "EFSName",
+    "ParameterValue": "LambdaEFS"
+  }
+]

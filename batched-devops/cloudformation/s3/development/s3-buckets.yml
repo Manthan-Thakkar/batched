@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation to deploy needed S3 Buckets'
+
+Parameters:
+  Environment:
+    Description: Environment Type (e.g prod, dev, qa, stg)
+    Type: String 
+
+
+Resources:
+  DataUploaderBucket01:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: !Sub 
+          - batched-${Environment}-r1
+          - {EnvironmentId: !Ref Environment}
+
+  DataUploaderBucket02:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: !Sub 
+          - batched-${Environment}-api-storage-r1
+          - {EnvironmentId: !Ref Environment} 
+
+  DataUploaderBucket03:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: !Sub 
+          - batched-${Environment}.r1
+          - {EnvironmentId: !Ref Environment}         
+  

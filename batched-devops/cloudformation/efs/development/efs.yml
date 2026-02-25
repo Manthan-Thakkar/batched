@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Cloudformation to deploy Elastic File System'
+Parameters:
+  EFSName:
+    Description: The name of the EFS Group
+    Type: String
+    Default: LambdaEFS
+
+Resources:
+  EFSFileSystem:
+        Type: AWS::EFS::FileSystem
+        Properties:
+            BackupPolicy:
+              Status: ENABLED
+            Encrypted: true
+            PerformanceMode: generalPurpose
+            Encrypted: true
+            ThroughputMode: bursting
+            FileSystemTags:
+            - Key: Name
+              Value: LambdaEFS
+
+  MountTargetResourceOne:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: 
+        Fn::ImportValue: PrivateSubnetOne
+      SecurityGroups: 
+        - Fn::ImportValue: EfsSecurityGroupId
+
+  MountTargetResourceTwo:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      SubnetId: 
+        Fn::ImportValue: PrivateSubnetTwo
+      SecurityGroups: 
+        - Fn::ImportValue: EfsSecurityGroupId
+ 
+  AccessPointResource:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref EFSFileSystem
+      PosixUser:
+        Uid: "1000"
+        Gid: "1000"
+      RootDirectory:
+        CreationInfo:
+          OwnerGid: "1000"
+          OwnerUid: "1000"
+          Permissions: "777"
+        Path: "/mnt"
+
+Outputs:
+    AccessPointArn:
+      Description: This is the Security Group ID for Lambda.
+      Value: 
+        Fn::GetAtt: AccessPointResource.AccessPointId
+      Export:
+        Name: LambdaEfsAccessPoint

@@ -1,0 +1,21 @@
+﻿CREATE TABLE TicketItemInfo(
+  Id							VARCHAR(36) PRIMARY KEY NOT NULL,
+  TicketId						VARCHAR(36) FOREIGN KEY REFERENCES TicketMaster(Id),
+  ProductId						VARCHAR(36) FOREIGN KEY REFERENCES ProductMaster(Id) NULL ,
+  StockProductId				VARCHAR(36) FOREIGN KEY REFERENCES StockProductMaster(Id) NULL ,
+  NumColors						SMALLINT NOT NULL,
+  OrderQuantity					INT NOT NULL,
+  SourceTicketItemId			NVARCHAR(255) NOT NULL,
+  CreatedOn						DATETIME,
+  ModifiedOn					DATETIME,
+  WorkStatus					NVARCHAR(4000) Null,
+  MachineCount					NVARCHAR(4000) Null,
+  SourceTicketItemPriority		NVARCHAR(510) NULL,
+  SourceTicketItemFinishType	NVARCHAR(510) NULL,
+  SourceTicketItemFinalUnwind	NVARCHAR(510) NULL,
+  Width							REAL NULL,
+  Length						REAL NULL,
+  ReceivedQuantity				REAL NULL, 
+  SalesOrderNumber				VARCHAR(1000) NULL,
+  SalesOrderDate				VARCHAR(100) NULL
+  )

@@ -1,0 +1,8 @@
+﻿CREATE TABLE ScopeHierarchy
+(
+  Id			VARCHAR(36)		CONSTRAINT [PK_ScopeHierarchyId] PRIMARY KEY NOT NULL,
+  Name			NVARCHAR(100)	NOT NULL,
+  Hierarchy		SMALLINT		NOT NULL,
+  CreatedOn		DATETIME,
+  ModifiedOn	DATETIME
+);

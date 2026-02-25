@@ -1,0 +1,8 @@
+﻿CREATE TABLE ShiftCalendarV2
+(
+Id VARCHAR(36) PRIMARY KEY,
+ShiftCalendarScheduleId VARCHAR(36) FOREIGN KEY REFERENCES ShiftCalendarScheduleV2(ID) NOT NULL,
+ShiftCalendarName VARCHAR(50) NOT NULL,
+CreatedOnUTC DATETIME,
+ModifiedOnUTC DATETIME
+)

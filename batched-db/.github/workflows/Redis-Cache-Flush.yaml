@@ -1,0 +1,50 @@
+name: Redis Cache Flush
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_to_environment:
+        type: choice
+        description: choose on which environment want to deploy
+        options:
+        - Development
+        - Production
+      redis-flush-all:
+        description: "Flush All Keys"
+        required: true
+        type: boolean
+      redis-flush-dsl:
+        description: "Flush DSL Keys ONLY"
+        required: true
+        type: boolean
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+
+jobs:
+  build:
+    name: Redis Cache Flush Batched DB
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: "${{ github.event.inputs.deploy_to_environment == 'Development' && 'batched-dev-runner' || github.event.inputs.deploy_to_environment == 'Production' && 'batched-prod-runner' || 'default-runner' }}"
+    steps:
+    - name: Redis Cache Flush All
+      if: ${{ inputs.redis-flush-all }}
+      run: |
+        echo KEYS=$(redis-cli --tls -h ${{ secrets.REDIS_ENDPOINT }} DBSIZE)
+        redis-cli --tls -h ${{ secrets.REDIS_ENDPOINT }} FLUSHDB
+        echo KEYS=$(redis-cli --tls -h ${{ secrets.REDIS_ENDPOINT }} DBSIZE)
+    - name: Redis Cache Flush DSL ONLY
+      if: ${{ inputs.redis-flush-dsl }}
+      run: |
+        DSL=$(redis-cli --tls -h ${{ secrets.REDIS_ENDPOINT }} KEYS *all-dsl-metadata)
+        redis-cli --tls -h ${{ secrets.REDIS_ENDPOINT }} DEL $DSL
+
+    - name: Cache Flush Summary
+      run: |
+        echo "## 🗑️ Redis Cache Flush Information - Environment: **${{ github.event.inputs.deploy_to_environment }}**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow:** Redis Cache Flush" >> $GITHUB_STEP_SUMMARY
+        echo "- **Flush All Keys:** ${{ inputs.redis-flush-all }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Flush DSL Keys Only:** ${{ inputs.redis-flush-dsl }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered By:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

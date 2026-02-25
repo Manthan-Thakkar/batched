@@ -1,0 +1,7 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "lt-batched-integration-rotation"
+resolve_s3 = true
+s3_prefix = "lt-batched-integration-rotation"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

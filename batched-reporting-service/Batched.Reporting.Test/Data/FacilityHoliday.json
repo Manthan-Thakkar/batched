@@ -1,0 +1,30 @@
+[
+  {
+    "Id": "id1",
+    "HolidayId": "holiday1",
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "CreatedOn": "2022-11-21 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  },
+  {
+    "Id": "id2",
+    "HolidayId": "holiday2",
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "CreatedOn": "2022-11-21 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  },
+  {
+    "Id": "id3",
+    "HolidayId": "holiday3",
+    "FacilityId": "4233c3a8-c524-4a2f-88c2-5b177955baf6",
+    "CreatedOn": "2022-11-21 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  },
+  {
+    "Id": "id4",
+    "HolidayId": "holiday4",
+    "FacilityId": "80f54ff0-848f-40e0-a350-4d3d9ee5ba89",
+    "CreatedOn": "2022-11-21 07:10:27.337",
+    "ModifiedOn": "2022-11-21 07:10:27.337"
+  }
+]

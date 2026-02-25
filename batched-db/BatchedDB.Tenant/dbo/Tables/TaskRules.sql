@@ -1,0 +1,7 @@
+﻿  CREATE TABLE TaskRules(
+  Id VARCHAR(36)  PRIMARY KEY NOT NULL,
+  TaskInfoId VARCHAR(36) FOREIGN KEY REFERENCES TaskInfo(Id), 
+  RuleName VARCHAR(255),
+  RuleText varchar(8000),
+  CreatedOn DATETIME,
+  ModifiedOn DATETIME);

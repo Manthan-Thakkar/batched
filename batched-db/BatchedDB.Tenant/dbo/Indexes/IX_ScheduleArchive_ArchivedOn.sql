@@ -1,0 +1,1 @@
+﻿CREATE INDEX [IX_ScheduleArchive_ArchivedOn] ON [dbo].[ScheduleArchive] (ArchivedOn)

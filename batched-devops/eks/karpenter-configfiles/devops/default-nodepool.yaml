@@ -1,0 +1,39 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default-nodepool
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        name: default-nodeclass
+      taints:
+        - key: karpenter.sh/nodepool
+          effect: NoExecute
+      requirements:
+        # - key: node.kubernetes.io/instance-type
+        #   operator: In
+        #   values: ["t3g.medium"]
+        - key: "eks.amazonaws.com/instance-category"
+          operator: In
+          values: ["t"]
+        - key: "eks.amazonaws.com/instance-generation"
+          operator: Gt
+          values: ["2"]
+        - key: "eks.amazonaws.com/instance-cpu"
+          operator: In
+          values: ["4", "8"]
+        - key: "karpenter.sh/capacity-type"
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: "kubernetes.io/arch"
+          operator: In
+          values: ["amd64"]
+  limits:
+    cpu: "40"
+    memory: 160Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 10m

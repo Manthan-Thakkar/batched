@@ -1,0 +1,21 @@
+﻿CREATE TYPE [dbo].[udt_ScheduleReportUpdate] AS TABLE(
+	[Id] [varchar](36) NOT NULL,
+	[EquipmentId] [varchar](36) NOT NULL,
+	[SourceTicketId] [nvarchar](255) NULL,
+	[TaskName] [nvarchar](10) NOT NULL,
+	[StartsAt] [datetime] NOT NULL,
+	[EndsAt] [datetime] NOT NULL,
+	[ChangeoverMinutes] [float] NULL,
+	[TaskMinutes] [float] NULL,
+	[IsPinned] [bit] NULL,
+	[FeasibilityOverride] [bit] NULL,
+	[IsUpdated] [bit] NULL,
+	[IsCalculated] [bit] NULL,
+	[MasterRollNumber] [varchar](255) NULL,
+	[CreatedOn] [datetime] NOT NULL,
+	[ModifiedOn] [datetime] NOT NULL,
+	[PinType] [nvarchar](24) NULL,
+	[ChangeoverCount] [int] NULL,
+	[ChangeoverDescription] [nvarchar](4000) NULL,
+	[IsNew] [bit] NOT NULL
+	)

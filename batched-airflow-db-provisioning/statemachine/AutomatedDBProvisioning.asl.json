@@ -1,0 +1,311 @@
+{
+    "Comment": "State Machine for Automated DB Provisioning",
+    "StartAt": "Create-ModelTenantDB-Backup",
+    "States": {
+        "Create-ModelTenantDB-Backup": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${AutomatedDBProvisioningArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Waitfor60Seconds-ModelTenantDB"
+        },
+        "Waitfor60Seconds-ModelTenantDB": {
+            "Type": "Wait",
+            "Seconds": 60,
+            "Next": "CheckBackupStatus-ModelTenantDB"
+        },
+        "CheckBackupStatus-ModelTenantDB": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${AutomatedDBProvisioningArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Choice-ModelTenantDB"
+        },
+        "Choice-ModelTenantDB": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Next": "Restore-ModelTenantDB-Backup-To-Tenant",
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS"
+                },
+                {
+                    "Next": "Waitfor60Seconds-ModelTenantDB",
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        },
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "CREATED"
+                        }
+                    ]
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "Fail"
+                }
+            ]
+        },
+        "Restore-ModelTenantDB-Backup-To-Tenant": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${AutomatedDBProvisioningArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Waitfor60Seconds-Restore-ModelTenantDB-Backup-To-Tenant"
+        },
+        "Waitfor60Seconds-Restore-ModelTenantDB-Backup-To-Tenant": {
+            "Type": "Wait",
+            "Seconds": 60,
+            "Next": "CheckBackupStatus-Restore-ModelTenantDB-Backup-To-Tenant"
+        },
+        "CheckBackupStatus-Restore-ModelTenantDB-Backup-To-Tenant": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "FunctionName": "${AutomatedDBProvisioningArn}",
+                "Payload.$": "$"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Choice-Restore-ModelTenantDB-Backup-To-Tenant"
+        },
+        "Choice-Restore-ModelTenantDB-Backup-To-Tenant": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "SeedData-To-Tenant"
+                },
+                {
+                    "Or": [
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "IN_PROGRESS"
+                        },
+                        {
+                            "Variable": "$.stepsDetails.stepStatus",
+                            "StringEquals": "CREATED"
+                        }
+                    ],
+                    "Next": "Waitfor60Seconds-Restore-ModelTenantDB-Backup-To-Tenant"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "Fail"
+                }
+            ]
+        },
+        "SeedData-To-Tenant": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${AutomatedDBProvisioningArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Choice-SeedData"
+        },
+        "Choice-SeedData": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "SUCCESS",
+                    "Next": "UpdateStatus-for-Tenant"
+                },
+                {
+                    "Variable": "$.stepsDetails.stepStatus",
+                    "StringEquals": "ERROR",
+                    "Next": "Fail"
+                }
+            ]
+        },
+        "UpdateStatus-for-Tenant": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${AutomatedDBProvisioningArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Fail"
+                }
+            ],
+            "Next": "Configure-HealthCheck-Schedules"
+        },
+        "Configure-HealthCheck-Schedules": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "${AutomatedDBProvisioningArn}"
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Comment": "Even if health check configuration fails, we proceed to Success as the main provisioning is complete",
+                    "Next": "Success"
+                }
+            ],
+            "Next": "Success"
+        },
+        "Fail": {
+            "Type": "Fail"
+        },
+        "Success": {
+            "Type": "Succeed"
+        }
+    }
+}

@@ -1,0 +1,224 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloudformation template for RDS
+Parameters:
+  PortNumber:
+    Description: The port number for the database server to listen on
+    Type: String
+    Default: 1433
+  AllocatedStorage:
+    Description: DB storage
+    Type: String
+    Default: 50 
+  MaxAllocatedStorage:
+    Description: Maximum Allocated Storage
+    Type: String
+    Default: 1000
+  DBInstanceClass:
+    Description: DB instance type
+    Type: String
+    Default: db.r5.large
+  DBEngine:
+    Description: DB Engine type
+    Type: String
+    Default: sqlserver-se 
+  MasterUsername:
+    Description: Enter username for master
+    Type: String
+  MasterUserPassword:
+    Description: Enter password for master
+    Type: String
+  StorageType:
+    Description: Specifies the storage type to be associated with the DB instance.
+    Type: String
+    Default: gp2
+    AllowedValues:
+    - io1
+    - gp2
+    - standard
+  BackupRetentionPeriod:
+    Description: The number of days during which automatic DB snapshots are retained.
+      Setting 0 disables automatic snapshots, maximum value is 35
+    Type: Number
+    Default: 35
+    MinValue: 0
+    MaxValue: 35
+  PreferredBackupWindow:
+    Description: The daily time range in UTC during which automated backups are created
+      (if automated backups are enabled). Cannot overlap with PreferredMaintenanceWindowTime
+    Type: String
+    Default: 00:00-02:00
+    AllowedValues:
+    - 00:00-02:00
+    - 01:00-03:00
+    - 02:00-04:00
+    - 03:00-05:00
+    - 04:00-06:00
+    - 05:00-07:00
+    - 06:00-08:00
+    - 07:00-09:00
+    - 08:00-10:00
+    - 09:00-11:00
+    - 10:00-12:00
+    - 11:00-13:00
+    - 12:00-14:00
+    - 13:00-15:00
+    - 14:00-16:00
+    - 15:00-17:00
+    - 16:00-18:00
+    - 17:00-19:00
+    - 18:00-20:00
+    - 19:00-21:00
+    - 20:00-22:00
+    - 21:00-23:00
+    - 22:00-24:00    
+  PreferredMaintenanceWindowStartTime:
+    Description: The weekly start time in UTC for the RDS maintenance window, must
+      be less than PreferredMaintenanceWindowEndTime and cannot overlap with PreferredBackupWindow
+    Type: String
+    Default: 04:00
+    AllowedValues:
+    - '00:00'
+    - '01:00'
+    - '02:00'
+    - '03:00'
+    - '04:00'
+    - '05:00'
+    - '06:00'
+    - '07:00'
+    - '08:00'
+    - '09:00'
+    - '10:00'
+    - '11:00'
+    - '12:00'
+    - '13:00'
+    - '14:00'
+    - '15:00'
+    - '16:00'
+    - '17:00'
+    - '18:00'
+    - '19:00'
+    - '20:00'
+    - '21:00'
+    - '22:00'    
+  PreferredMaintenanceWindowDay:
+    Description: The day of the week which RDS maintenance will be performed
+    Type: String
+    Default: Sat
+    AllowedValues:
+    - Mon
+    - Tue
+    - Wed
+    - Thu
+    - Fri
+    - Sat
+    - Sun
+  PreferredMaintenanceWindowEndTime:
+    Description: The weekly end time in UTC for the RDS maintenance window, must be
+      more than PreferredMaintenanceWindowEndTime and cannot overlap with PreferredBackupWindow
+    Type: String
+    Default: 06:00
+    AllowedValues:
+    - '00:00'
+    - '01:00'
+    - '02:00'
+    - '03:00'
+    - '04:00'
+    - '05:00'
+    - '06:00'
+    - '07:00'
+    - '08:00'
+    - '09:00'
+    - '10:00'
+    - '11:00'
+    - '12:00'
+    - '13:00'
+    - '14:00'
+    - '15:00'
+    - '16:00'
+    - '17:00'
+    - '18:00'
+    - '19:00'
+    - '20:00'
+    - '21:00'
+    - '22:00'
+  PubliclyAccessible:
+    Description: Indicates whether the DB instance is an Internet-facing instance.
+    Type: String
+    Default: 'false'
+    AllowedValues:
+    - 'true'
+    - 'false'
+  AccessCidr:
+    Description: CIDR block to allow to connect to database
+    Type: String
+    Default: Access CIDR
+
+  AvailabilityZone:
+    Description: Availability Zone for DB 
+    Type: String
+    Default: us-east-2
+
+Resources:
+  BatchedDB:
+    Type: AWS::RDS::DBInstance
+    Properties:    
+      VPCSecurityGroups:
+        - Ref: DBSecurityGroup
+      AllocatedStorage: 
+        Ref: AllocatedStorage 
+      DBInstanceClass: 
+        Ref: DBInstanceClass       
+      Engine:
+        Ref: DBEngine
+      MasterUsername:
+        Ref: MasterUsername
+      MasterUserPassword:
+        Ref: MasterUserPassword
+      StorageEncrypted: 'true'
+      StorageType:
+        Ref: StorageType
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      BackupRetentionPeriod:
+        Ref: BackupRetentionPeriod
+      PreferredBackupWindow:
+        Ref: PreferredBackupWindow
+      PreferredMaintenanceWindow: !Sub ${PreferredMaintenanceWindowDay}:${PreferredMaintenanceWindowStartTime}-${PreferredMaintenanceWindowDay}:${PreferredMaintenanceWindowEndTime}
+      PubliclyAccessible:
+        Ref: PubliclyAccessible
+      Port:
+        Ref: PortNumber
+      DeletionProtection: true
+      MaxAllocatedStorage: 
+        Ref: MaxAllocatedStorage 
+      MultiAZ: true
+      LicenseModel: license-included
+      Tags:
+      - Key: Name
+        Value: Master Database      
+    DeletionPolicy: Snapshot
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription:  Database Subnet
+      SubnetIds:
+      - Fn::ImportValue: PrivateSubnetOne
+      - Fn::ImportValue: PrivateSubnetTwo
+  
+
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      SecurityGroupIngress:
+            - IpProtocol: tcp
+              FromPort: '1433'
+              ToPort: '1433'
+              SourceSecurityGroupId: sg-0d9334d08e7e25655
+      SecurityGroupEgress:
+            - IpProtocol: '-1'
+              FromPort: '-1'
+              ToPort: '-1'
+              CidrIp: 0.0.0.0/0
+      VpcId: vpc-0cd31d7b87027c997
+      GroupDescription: database access

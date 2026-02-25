@@ -1,0 +1,65 @@
+# Default values for aws-load-balancer-controller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: public.ecr.aws/eks/aws-load-balancer-controller
+  tag: v2.9.0
+  pullPolicy: IfNotPresent
+
+# AWS LBC only has 1 main working pod, other pods are just standby
+# the purpose of enable hpa is to survive load induced failure by the calls to the aws-load-balancer-webhook-service
+# since the calls from kube-apiserver are sent round-robin to all replicas, and the failure policy on those webhooks is Fail
+# if the pods become overloaded and do not respond within the timeout that could block the creation of pods, targetgroupbindings or ingresses
+# Please keep in mind that the controller pods have `priorityClassName: system-cluster-critical`, enabling HPA may lead to the eviction of other low-priority pods in the node
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::061669522376:role/AmazonEKSLoadBalancerControllerRole
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+  # Automount API credentials for a Service Account.
+  automountServiceAccountToken: true
+  # List of image pull secrets to add to the Service Account.
+  imagePullSecrets:
+    # - name: docker
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1000Mi
+  requests:
+    cpu: 500m
+    memory: 700Mi
+
+nodeSelector:
+  kubernetes.io/os: linux
+  EKSManaged: 'true'
+
+# The name of the Kubernetes cluster. A non-empty value is required
+clusterName: batched-eks-dev-cluster
+
+# controllerConfig specifies controller configuration
+controllerConfig:
+  # featureGates set of key: value pairs that describe AWS load balance controller features
+  featureGates: {}
+  # ListenerRulesTagging: true
+  # WeightedTargetGroups: true
+  # ServiceTypeLoadBalancerOnly: false
+  # EndpointsFailOpen: true
+  # EnableServiceController: true
+  # EnableIPTargetType: true
+  # SubnetsClusterTagCheck: true
+  # NLBHealthCheckAdvancedConfig: true
+  # ALBSingleSubnet: false

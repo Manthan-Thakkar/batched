@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[JobRunTable]
+(
+	[ID] VARCHAR(36) NOT NULL,
+	[JobRunId] VARCHAR(4000) NULL,
+	[ImportedTableName] VARCHAR(36),
+	[CreatedOn] DATETIME,
+	CONSTRAINT [PK_JobRunTableID] PRIMARY KEY NONCLUSTERED([ID] ASC)
+);

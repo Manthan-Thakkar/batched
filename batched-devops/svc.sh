@@ -1,0 +1,6 @@
+kubectl patch serviceaccount default -n backend-api-prod --type=merge -p '{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"arn:aws:iam::033237185297:role/secrets-store-csi-driver-role"}}}'
+kubectl patch serviceaccount default -n dal-backend-api-prod --type=merge -p '{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"arn:aws:iam::033237185297:role/secrets-store-csi-driver-role"}}}'
+kubectl patch serviceaccount default -n r-scheduler-prod --type=merge -p '{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"arn:aws:iam::033237185297:role/secrets-store-csi-driver-role"}}}'
+kubectl patch serviceaccount default -n reporting-service-prod --type=merge -p '{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"arn:aws:iam::033237185297:role/secrets-store-csi-driver-role"}}}'
+kubectl patch serviceaccount default -n rules-engine-prod --type=merge -p '{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"arn:aws:iam::033237185297:role/secrets-store-csi-driver-role"}}}'
+kubectl patch serviceaccount default -n schedule-service-prod --type=merge -p '{"metadata":{"annotations":{"eks.amazonaws.com/role-arn":"arn:aws:iam::033237185297:role/secrets-store-csi-driver-role"}}}'

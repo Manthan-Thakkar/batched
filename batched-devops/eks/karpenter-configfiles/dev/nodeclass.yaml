@@ -1,0 +1,32 @@
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: default
+spec:
+  amiFamily: Bottlerocket
+  amiSelectorTerms:
+    - alias: bottlerocket@latest
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "batched-eks-dev-cluster"
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "batched-eks-dev-cluster"
+  role: "KarpenterNodeRole-batched-eks-dev-cluster"
+  tags:
+    team: batched-dev
+    karpenterNode: 'true'
+  blockDeviceMappings:
+    # Root device
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 4Gi
+        volumeType: gp3
+        encrypted: true
+    # Data device: Container resources such as images and logs
+    - deviceName: /dev/xvdb
+      ebs:
+        volumeSize: 20Gi
+        volumeType: gp3
+        encrypted: true
+  detailedMonitoring: true

@@ -1,0 +1,11 @@
+﻿CREATE TABLE [dbo].[JobRun] (
+	[Id]			VARCHAR(36)		NOT NULL,	
+	[JobId]			VARCHAR (36)	NOT NULL CONSTRAINT [FK_JobRun_JobID] FOREIGN KEY REFERENCES Job(Id),	
+	[RunId]			VARCHAR(100),
+	[WorkflowStep]  NVARCHAR(50),
+	[StartTime]		DATETIME,	
+	[EndTime] 		DATETIME,	
+	[Status]		VARCHAR(15),
+	[TimeStamp]		DATETIME,
+    CONSTRAINT [PK_JobRunId] PRIMARY KEY NONCLUSTERED ([ID] ASC)
+);

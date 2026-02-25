@@ -1,0 +1,175 @@
+// database = [
+//     BatchedDb : 'BatchedDB.Configuration',
+//     TenantDb : 'BatchedDB.Tenant'
+//]
+
+// publish_type = [
+//     state : 'StateBasedBuild',
+//     migration : 'MigrationBasedBuild'
+// ]
+
+// Region = [
+//     development : 'us-east-2',
+//     production : 'us-east-1' 
+// ]
+
+rdsPassword = [
+  development : "batched-development-rds-password"
+]
+
+rdsUsername = [
+  development : "batched-development-rds-username"
+]
+
+rdsPassword2 = [
+  development : "batched-development-rds-2-password"
+]
+
+rdsUsername2 = [
+  development : "batched-development-rds-2-username"
+]
+
+dbHostname = [
+  development : "dev-db-hostname"
+]
+
+dbHostname2 = [
+  development : "dev-db-hostname2"
+]
+
+pipeline {
+
+  agent any
+
+  parameters {
+    choice(name: 'deploy_to', choices: ['development'], description: "Select Environment Name For Deployment")
+//    choice(name: 'deploy_type', choices: ['StateBasedBuild','MigrationBasedBuild'], description: "Select Environment Name For Deployment")
+//    choice(name: 'db_deploy', choices: ['BatchedDB.Configuration','BatchedDB.Tenant'], description: "Select Environment Name For Deployment")      
+//    string(name: "TargetDb", defaultValue: " ", description: "Add the deployment description here, so it will present in the deployment history")
+  }
+  
+  stages {
+
+    // stage('script path modification') {
+    //   steps {
+
+    //     dir("BatchedDB.Tenant/PostDeploymentScripts/") {
+
+    //         sh '''
+    //           tr '\\\\\\\\' '/' < Script.PostDeployment.sql | tee Script.PostDeployment.sql
+    //         sh '''
+
+    //     }
+        
+    //   }
+    // } 
+
+    stage('Model tenant Db Radius') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+
+          dir("BatchedDB.Tenant.Radius/StateBasedBuild/") {
+            sh '''#!/bin/bash
+            
+            // " tr '\\\\\\\\' '/' < Script.PostDeployment.sql | tee Script.PostDeployment.sql "
+
+            // cat ../PostDeploymentScripts/Script.PostDeployment.sql
+            
+            dotnet build
+            if [ $? -eq 0 ]; then
+                echo "Build is Successful"
+            else
+                echo "Build Failed"
+                exit 1
+            fi
+
+            ~/sqlpackage/sqlpackage /Action:Publish \
+            /SourceFile:./bin/Debug/netstandard2.0/model-Tenant.dacpac \
+            /TargetServerName:${DB_TSN},1433 \
+            /TargetDatabaseName:model-tenantdb-radius \
+            /TargetUser:${DB_USERNAME} \
+            /TargetPassword:${DB_PASSWORD} \
+            /DeployScriptPath:"./Result-${BUILD_NUMBER}.txt" \
+            /p:TreatVerificationErrorsAsWarnings=True \
+            /p:BlockOnPossibleDataLoss=True
+
+            
+            sh '''
+          }
+        }
+      }
+    }
+
+  stage('db list') {
+        steps {
+          withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.Radius/MigrationBasedBuild/") {
+            sh '''#!/bin/bash
+            
+             dotnet build
+             if [ $? -eq 0 ]; then
+                echo "Build is Successful"
+             else
+                echo "Build Failed"
+                exit 1
+             fi
+              
+              /opt/mssql-tools/bin/sqlcmd \
+              -S ${DB_TSN},1433 \
+              -U ${DB_USERNAME}  \
+              -P ${DB_PASSWORD} -h-1 \
+              -q "EXIT(Set NoCount ON; Use batched; Select DBname FROM Batched.dbo.TenantDatabase TD INNER JOIN Tenant T ON TD.TenantId = T.ID INNER JOIN ERPMaster EM ON T.ERPId = EM.Id where T.IsEnabled = 1 AND EM.Name = 'Radius')" \
+              -m 1 \
+              -o radius-dblist
+                            
+            sh '''
+            }
+        }
+      }
+  }
+    
+  
+        stage('clients tenant Db on 2nd RDS') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword2["${deploy_to}"], , variable: 'DB_PASSWORD2'), string(credentialsId: rdsUsername2["${deploy_to}"], , variable: 'DB_USERNAME2'),string(credentialsId: dbHostname2["${deploy_to}"], , variable: 'DB_TSN2')]) {
+
+          dir("BatchedDB.Tenant.Radius/MigrationBasedBuild/") {
+            sh '''#!/bin/bash
+             
+             dotnet build
+
+              /opt/mssql-tools/bin/sqlcmd \
+              -S ${DB_TSN2},1433 \
+              -U ${DB_USERNAME2}  \
+              -P ${DB_PASSWORD2} -h-1 \
+              -q "EXIT(Set NoCount ON; select name from sys.databases WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb', 'rdsadmin');)" \
+              -o dblist2
+
+             chmod +x radius-db.sh
+             ./radius-db.sh
+
+             chmod +x tenantMigration_2.sh
+             ./tenantMigration_2.sh
+
+              
+            sh '''
+          }
+        }
+      }
+    }
+    stage('Cleanup') {
+      steps {
+        withCredentials([string(credentialsId: rdsPassword["${deploy_to}"], , variable: 'DB_PASSWORD'), string(credentialsId: rdsUsername["${deploy_to}"], , variable: 'DB_USERNAME'),string(credentialsId: dbHostname["${deploy_to}"], , variable: 'DB_TSN')]) {
+          dir("BatchedDB.Tenant.Radius/MigrationBasedBuild/") {
+            sh '''
+             rm dblist*
+             rm radius-dblist
+            sh '''
+            }
+        }
+      }
+      }  
+
+  }
+
+}

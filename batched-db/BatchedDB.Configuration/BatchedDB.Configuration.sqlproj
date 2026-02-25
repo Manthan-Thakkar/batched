@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>BatchedDB.Configuration</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{8dcd04e1-693a-437b-bde0-66f102264d35}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath />
+    <RootNamespace>BatchedDB.Configuration</RootNamespace>
+    <AssemblyName>BatchedDB.Configuration</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="PostDeploymentScripts" />
+    <Folder Include="PostDeploymentScripts\Schema" />
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Indexes" />
+    <Folder Include="dbo\Indexes\Client" />
+    <Folder Include="dbo\Indexes\Facility" />
+    <Folder Include="dbo\Indexes\Role" />
+    <Folder Include="dbo\Indexes\Tenant" />
+    <Folder Include="dbo\Indexes\TicketAttribute" />
+    <Folder Include="dbo\Indexes\UserAccount" />
+    <Folder Include="dbo\Indexes\UserOTP" />
+    <Folder Include="dbo\Indexes\UserProfile" />
+    <Folder Include="dbo\Indexes\WorkcenterChangeover" />
+    <Folder Include="dbo\Indexes\WorkcenterConstraint" />
+    <Folder Include="dbo\Stored Procedures" />
+    <Folder Include="dbo\Tables" />
+    <Folder Include="dbo\Tables\Agent-Jobs" />
+    <Folder Include="dbo\Types" />
+    <Folder Include="dbo\Indexes\ScheduleArchive" />
+    <Folder Include="dbo\Indexes\Agent" />
+    <Folder Include="dbo\Indexes\Job" />
+    <Folder Include="dbo\Indexes\JobRun" />
+    <Folder Include="dbo\Indexes\TenantUser" />
+    <Folder Include="PostDeploymentScripts\Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Indexes\ScheduleArchive\IX_ScheduleArchiveInfo_Id_TenantId.sql" />
+    <Build Include="dbo\Indexes\ScheduleArchive\IX_ScheduleArchiveStatus_TenantId_ScheduleArchiveId.sql" />
+    <Build Include="dbo\Tables\AccessClientPermissions.sql" />
+    <Build Include="dbo\Tables\TimeSpan.sql" />
+    <Build Include="dbo\Tables\FacilityValueStreamScheduleEvent.sql" />
+    <Build Include="dbo\Tables\FacilityScheduleArchival.sql" />
+    <Build Include="dbo\Stored Procedures\spInsertUpdateFacilityData.sql" />
+    <Build Include="dbo\Types\udt_FacilityData.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\DefaultDataSourceQuery.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\AgentType.sql" />
+    <Build Include="dbo\Tables\ReportViewRules.sql" />
+    <Build Include="dbo\Tables\FieldDataType.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\CloudJobQuery.sql" />
+    <Build Include="dbo\Tables\AccessTenantPermissions.sql" />
+    <Build Include="dbo\Tables\UserContext.sql" />
+    <Build Include="dbo\Stored Procedures\spInsertUpdateUserRecordsBulk_labelTraxx.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BatchedDB.Configuration.publish.xml" />
+    <None Include="PostDeploymentScripts\Data\2026-01-23_ColorByUnit_dsl.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Indexes\Client\IX_Clients_DisplayName.sql" />
+    <Build Include="dbo\Indexes\Facility\IX_Facility_City.sql" />
+    <Build Include="dbo\Indexes\Facility\IX_Facility_Name.sql" />
+    <Build Include="dbo\Indexes\Role\IX_Role_Name.sql" />
+    <Build Include="dbo\Indexes\Tenant\IX_Tenant_Name.sql" />
+    <Build Include="dbo\Indexes\TicketAttribute\IX_TicketAttribute_Description.sql" />
+    <Build Include="dbo\Indexes\TicketAttribute\IX_TicketAttribute_Name.sql" />
+    <Build Include="dbo\Indexes\UserAccount\IX_UserAccounts_UserName.sql" />
+    <Build Include="dbo\Indexes\UserOTP\IX_UserOTP_ValidFrom.sql" />
+    <Build Include="dbo\Indexes\UserProfile\IX_UserProfile_Email.sql" />
+    <Build Include="dbo\Indexes\WorkcenterChangeover\IX_WorkcenterChangeover_Desc.sql" />
+    <Build Include="dbo\Indexes\WorkcenterChangeover\IX_WorkcenterChangeover_Name.sql" />
+    <Build Include="dbo\Indexes\WorkcenterConstraint\IX_WorkcenterConstraint_Description.sql" />
+    <Build Include="dbo\Indexes\WorkcenterConstraint\IX_WorkcenterConstraint_Name.sql" />
+    <Build Include="dbo\Stored Procedures\spInsertUpdateUserRecords.sql" />
+    <Build Include="dbo\Stored Procedures\spInsertUpdateUserRecordsV2.sql" />
+    <Build Include="dbo\Stored Procedures\spLogCreator.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\Agent.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\AgentSettings.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\DataSource.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\Job.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\JobRun.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\JobRunAdditionalInfo.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\OdbcDataSourceQuery.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\S3DataDestination.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\WebSvcDataQuery.sql" />
+    <Build Include="dbo\Tables\Access.sql" />
+    <Build Include="dbo\Tables\AccessPermission.sql" />
+    <Build Include="dbo\Tables\BusinessEntity.sql" />
+    <Build Include="dbo\Tables\Client.sql" />
+    <Build Include="dbo\Tables\ClientUser.sql" />
+    <Build Include="dbo\Tables\Country.sql" />
+    <Build Include="dbo\Tables\DefaultOdbcDataSourceQuery.sql" />
+    <Build Include="dbo\Tables\DslMetaData.sql" />
+    <Build Include="dbo\Tables\Facility.sql" />
+    <Build Include="dbo\Tables\FacilityUser.sql" />
+    <Build Include="dbo\Tables\MasterRollClassificationGroup.sql" />
+    <Build Include="dbo\Tables\PowerBIConfiguration.sql" />
+    <Build Include="dbo\Tables\Role.sql" />
+    <Build Include="dbo\Tables\RolePermission.sql" />
+    <Build Include="dbo\Tables\ScopeHierarchy.sql" />
+    <Build Include="dbo\Tables\SecurityAuditTrail.sql" />
+    <Build Include="dbo\Tables\TaskClassificationGroup.sql" />
+    <Build Include="dbo\Tables\Tenant.sql" />
+    <Build Include="dbo\Tables\TenantDatabase.sql" />
+    <Build Include="dbo\Tables\SeedTenantQueryTemplate.sql" />
+    <Build Include="dbo\Tables\TenantUser.sql" />
+    <Build Include="dbo\Tables\TicketAttribute.sql" />
+    <Build Include="dbo\Tables\TicketAttributeFormula.sql" />
+    <Build Include="dbo\Tables\Timezone.sql" />
+    <Build Include="dbo\Tables\UserAccounts.sql" />
+    <Build Include="dbo\Tables\UserOTP.sql" />
+    <Build Include="dbo\Tables\UserProfile.sql" />
+    <Build Include="dbo\Tables\UserRole.sql" />
+    <Build Include="dbo\Tables\WorkcenterChangeover.sql" />
+    <Build Include="dbo\Tables\WorkCenterConstraint.sql" />
+    <Build Include="dbo\Tables\WorkCenterType.sql" />
+    <Build Include="dbo\Types\__ErrorInfoLog.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\S3DataTransferType.sql" />
+    <Build Include="dbo\Tables\ClientIPWhiteList.sql" />
+    <Build Include="dbo\Tables\InstanceType.sql" />
+    <Build Include="dbo\Tables\TenantSizeType.sql" />
+    <Build Include="dbo\Tables\DatabaseInstance.sql" />
+    <Build Include="dbo\Tables\ScheduleEvent.sql" />
+    <Build Include="dbo\Tables\MultiRdsRollout_TT.sql" />
+    <Build Include="dbo\Tables\WindowsLinuxTimezone.sql" />
+    <Build Include="dbo\Tables\TaskInfo.sql" />
+    <Build Include="dbo\Tables\TaskRules.sql" />
+    <Build Include="dbo\Stored Procedures\spGetDbInstanceInfo.sql" />
+    <Build Include="dbo\Tables\ScheduleEventLog.sql" />
+    <Build Include="dbo\Stored Procedures\spLogScheduleEvents.sql" />
+    <Build Include="dbo\Tables\ReportMaster.sql" />
+    <Build Include="dbo\Tables\FieldMaster.sql" />
+    <Build Include="dbo\Tables\ReportView.sql" />
+    <Build Include="dbo\Tables\ReportViewField.sql" />
+    <Build Include="dbo\Tables\BusinessCategory.sql" />
+    <Build Include="dbo\Tables\Agent-Jobs\ExportDestination.sql" />
+    <Build Include="dbo\Stored Procedures\spGetSeedTenantData.sql" />
+    <Build Include="dbo\Tables\ERPMaster.sql" />
+    <Build Include="dbo\Stored Procedures\spInsertUpdateUserRecords_Radius.sql" />
+    <Build Include="dbo\Types\udt_User.sql" />
+    <Build Include="dbo\Indexes\UserAccount\IX_UserAccounts_SourceUserId.sql" />
+    <Build Include="dbo\Tables\ScheduleArchiveInfo.sql" />
+    <Build Include="dbo\Tables\ScheduleArchiveStatus.sql" />
+    <Build Include="dbo\Stored Procedures\spInsertUpdateFacilityData_Radius.sql" />
+    <Build Include="dbo\Types\udt_Facility.sql" />
+    <Build Include="dbo\Tables\RestrictedClients.sql" />
+    <Build Include="dbo\Indexes\Agent\IX_Agent_TenantId.sql" />
+    <Build Include="dbo\Indexes\Job\IX_Job_AgentId.sql" />
+    <Build Include="dbo\Indexes\JobRun\IX_JobRun_JobId_Timestamp_WorkflowStep.sql" />
+    <Build Include="dbo\Indexes\Tenant\IX_Tenant_ERPId.sql" />
+    <Build Include="dbo\Indexes\Tenant\IX_Tenant_ClientId.sql" />
+    <Build Include="dbo\Indexes\Tenant\IX_Tenant_IsEnabled_Status.sql" />
+    <Build Include="dbo\Indexes\Facility\IX_Facility_TenantId.sql" />
+    <Build Include="dbo\Indexes\TenantUser\IX_TenantUser_TenantId.sql" />
+    <Build Include="dbo\Indexes\UserProfile\IX_UserProfile_UserId.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="PostDeploymentScripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+</Project>

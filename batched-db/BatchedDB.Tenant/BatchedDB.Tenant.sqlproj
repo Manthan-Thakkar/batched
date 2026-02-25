@@ -1,0 +1,522 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>BatchedDB.Tenant</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{4c023bc7-54e6-42a5-b8c9-756c0dc39c9f}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath />
+    <RootNamespace>BatchedDB.Tenant</RootNamespace>
+    <AssemblyName>BatchedDB.Tenant</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Functions" />
+    <Folder Include="dbo\Indexes" />
+    <Folder Include="dbo\Stored Procedures" />
+    <Folder Include="dbo\Tables" />
+    <Folder Include="dbo\Tables\Google sheet tables" />
+    <Folder Include="dbo\Types" />
+    <Folder Include="dbo\Views" />
+    <Folder Include="PostDeploymentScripts" />
+    <Folder Include="PostDeploymentScripts\Data" />
+    <Folder Include="PostDeploymentScripts\Schema" />
+    <Folder Include="dbo\Triggers" />
+    <Folder Include="PostDeploymentScripts\TenantSpecific" />
+    <Folder Include="dbo\Scripts" />
+  </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="AgentName">
+      <DefaultValue />
+      <Value>$(SqlCmdVar__2)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="ConfigurationDBName">
+      <DefaultValue />
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="S3Region">
+      <DefaultValue />
+      <Value>$(SqlCmdVar__5)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="S3SecretKey">
+      <DefaultValue />
+      <Value>$(SqlCmdVar__4)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="S3Token">
+      <DefaultValue />
+      <Value>$(SqlCmdVar__3)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="TenantConnectionString">
+      <DefaultValue />
+      <Value>$(SqlCmdVar__6)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="TenantId">
+      <DefaultValue />
+      <Value>$(SqlCmdVar__7)</Value>
+    </SqlCmdVariable>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BatchedDB.Tenant.publish.xml" />
+    <None Include="dbo\Functions\udf_GetAlphanumericString.sql" />
+    <None Include="dbo\Indexes\IX_TicketShipping_TicketId_ShipByDateTime_ShippedOnDate.sql" />
+    <None Include="dbo\Indexes\IX_TicketTask_TicketId_TaskName.sql" />
+    <None Include="dbo\Indexes\IX_ScheduleReport_SourceTicketId.sql" />
+    <None Include="dbo\Indexes\IX_ScheduleOverride_TicketId.sql" />
+    <None Include="dbo\Indexes\IX_TicketAttributeValues_TicketId_Name.sql" />
+    <None Include="dbo\Indexes\IX_EquipmentMaster_EquipmentId_FacilityId.sql" />
+    <None Include="dbo\Indexes\IX_TicketMaster_TicketId_CustomerName_ITSName_OTSName.sql" />
+    <None Include="dbo\Indexes\IX_OpenTicketColorsV2_TicketId_Color.sql" />
+    <None Include="dbo\Indexes\IX_TicketStockAvailability_TicketId_FacilityId_StockId_Width_Length.sql" />
+    <None Include="dbo\Indexes\IX_TicketMaster_TicketId_StockStatus.sql" />
+    <None Include="dbo\Indexes\IX_StockMaterial_Id_SourceStockId_StockType.sql" />
+    <None Include="dbo\Indexes\IX_StockInventory_StockMaterial_StockUsed.sql" />
+    <None Include="dbo\Indexes\IX_StockInventory_StockUsed.sql" />
+    <None Include="dbo\Indexes\IX_PurchaseOrderItem_PurchaseOrderId.sql" />
+    <None Include="dbo\Indexes\IX_PurchaseOrderMaster_IsOpen.sql" />
+    <None Include="dbo\Indexes\IX_TicketMaster_OrderDate_SourceTicketId.sql" />
+    <None Include="PostDeploymentScripts\Schema\2026-01-23_spCalculateDslValues.sql" />
+    <None Include="dbo\Scripts\Calendar.sql" />
+    <None Include="dbo\Scripts\MinuteWiseCalendar.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Functions\SplitString.sql" />
+    <Build Include="dbo\Functions\udf_Calculate_Color_Changes.sql" />
+    <Build Include="dbo\Functions\udf_Calculate_Fixed_Color_Changes.sql" />
+    <Build Include="dbo\Functions\udf_Calculate_Fixed_Tool_Changes.sql" />
+    <Build Include="dbo\Functions\udf_Calculate_Tool_Changes.sql" />
+    <Build Include="dbo\Functions\udf_Check_Gear_Tooth.sql" />
+    <Build Include="dbo\Functions\udf_Check_Stock_Substitutes.sql" />
+    <Build Include="dbo\Functions\udf_DateRange.sql" />
+    <Build Include="dbo\Functions\udf_WorkDays.sql" />
+    <Build Include="dbo\Functions\udf-Create-Range-Date.sql" />
+    <Build Include="dbo\Indexes\IX_EquipmentCalendar_EquipmentId_TheDateTime_Available.sql" />
+    <Build Include="dbo\Indexes\IX_FacilityHoliday_HolidayId.sql" />
+    <Build Include="dbo\Indexes\IX_HolidaySchedule_Date.sql" />
+    <Build Include="dbo\Indexes\IX_MinutewiseCalendar_TheDate.sql" />
+    <Build Include="dbo\Indexes\IX_ShiftCalendarDates_ShiftCalendarId.sql" />
+    <Build Include="dbo\Indexes\IX_ShiftCalendarPattern_ShiftCalendarId.sql" />
+    <Build Include="dbo\Indexes\IX_ShiftCalendarSchedule_EquipmentId.sql" />
+    <Build Include="dbo\Indexes\IX_ShiftOverrideTimes_ShiftOverrideId.sql" />
+    <Build Include="dbo\Indexes\IX_TicketDataCache_temp_TicketNumber_TaskName.sql" />
+    <Build Include="dbo\Indexes\IX_TicketDataCache_TicketNumber_TaskName.sql" />
+    <Build Include="dbo\Stored Procedures\CreateShiftCalender_Daily.sql" />
+    <Build Include="dbo\Stored Procedures\Generate_OpenFeasibleTicketRoutes.sql" />
+    <Build Include="dbo\Stored Procedures\Generate_PressDownTime.sql" />
+    <Build Include="dbo\Stored Procedures\Generate_ShiftCalendarCurrent.sql" />
+    <Build Include="dbo\Stored Procedures\generateOpenTicketTools.sql" />
+    <Build Include="dbo\Stored Procedures\GetAPIConfigDateBatches.sql" />
+    <Build Include="dbo\Stored Procedures\GetAPIConfigNumericBatches.sql" />
+    <Build Include="dbo\Stored Procedures\GetAPIConfigNumericBatchWise.sql" />
+    <Build Include="dbo\Stored Procedures\GetAPIConfigNumericBatchWiseIncr.sql" />
+    <Build Include="dbo\Stored Procedures\GetAPIForSpecialEndpointsIncr.sql" />
+    <Build Include="dbo\Stored Procedures\GetAPIList.sql" />
+    <Build Include="dbo\Stored Procedures\GetGONEAPIConfigNumericBatches.sql" />
+    <Build Include="dbo\Stored Procedures\InitialAPIListDataCheck.sql" />
+    <Build Include="dbo\Stored Procedures\proc_AllOpenTicketTasks_Table.sql" />
+    <Build Include="dbo\Stored Procedures\proc_UpdateCustomerPareto.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateDslValues.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateEquipmentDslValues.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateUnassignedJobsDSLValues.sql" />
+    <Build Include="dbo\Stored Procedures\spCreateOpenTicketColors.sql" />
+    <Build Include="dbo\Stored Procedures\spCreateUnassignedJobsData.sql" />
+    <Build Include="dbo\Stored Procedures\spCreateUnassignedJobsDataIncr.sql" />
+    <Build Include="dbo\Stored Procedures\spGenerateTicketDataCache.sql" />
+    <Build Include="dbo\Stored Procedures\spgetschedulereportdetail.sql" />
+    <Build Include="dbo\Stored Procedures\spLogCreator.sql" />
+    <Build Include="dbo\Stored Procedures\spShipTimeDslValues.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateStagingStatusInTicketDataCache.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateTicketDataCacheOnTaskStatusChange.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateTicketShipping.sql" />
+    <Build Include="dbo\Stored Procedures\TableToClass.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\ChangeOverStandards.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\EquipmentShiftByDay.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\FlexoCylinders.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\FlexoMagCylinders.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\Holidays.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\MasterConstraintList.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\MasterEquipmentReference.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\PressDownTime.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\PressUpTime.sql" />
+    <Build Include="dbo\Tables\Google sheet tables\SubstrateGroupings.sql" />
+    <Build Include="dbo\Tables\AllOpenTicketTasks_Table.sql" />
+    <Build Include="dbo\Tables\ApiConfigParam.sql" />
+    <Build Include="dbo\Tables\ApiConfigParamFresh.sql" />
+    <Build Include="dbo\Tables\ApiConfigParamGenericOneFresh.sql" />
+    <Build Include="dbo\Tables\Calendar.sql" />
+    <Build Include="dbo\Tables\ChangeoverMinutes.sql" />
+    <Build Include="dbo\Tables\ClientDaysOff.sql" />
+    <Build Include="dbo\Tables\customerPareto.sql" />
+    <Build Include="dbo\Tables\CustomerRank.sql" />
+    <Build Include="dbo\Tables\DailyBatch.sql" />
+    <Build Include="dbo\Tables\EquipmentCalendar.sql" />
+    <Build Include="dbo\Tables\EquipmentChangeover.sql" />
+    <Build Include="dbo\Tables\EquipmentConstraint.sql" />
+    <Build Include="dbo\Tables\EquipmentCustomField.sql" />
+    <Build Include="dbo\Tables\EquipmentDowntime.sql" />
+    <Build Include="dbo\Tables\EquipmentMaster.sql" />
+    <Build Include="dbo\Tables\FacilityHoliday.sql" />
+    <Build Include="dbo\Tables\FeasibleRoutes.sql" />
+    <Build Include="dbo\Tables\HolidaySchedule.sql" />
+    <Build Include="dbo\Tables\ImportFieldRule.sql" />
+    <Build Include="dbo\Tables\JobRunTable.sql" />
+    <Build Include="dbo\Tables\masterRollBatching.sql" />
+    <Build Include="dbo\Tables\MasterRollClassificationGroup.sql" />
+    <Build Include="dbo\Tables\masterSchedule.sql" />
+    <Build Include="dbo\Tables\masterScheduleArchive.sql" />
+    <Build Include="dbo\Tables\MinutewiseCalendar.sql" />
+    <Build Include="dbo\Tables\MiscInputs.sql" />
+    <Build Include="dbo\Tables\openFeasibleTicketRoutes.sql" />
+    <Build Include="dbo\Tables\OpenTicketChangeovers.sql" />
+    <Build Include="dbo\Tables\OpenTicketColors.sql" />
+    <Build Include="dbo\Tables\OpenTicketColorsV2.sql" />
+    <Build Include="dbo\Tables\OpenTicketRoutesRaw.sql" />
+    <Build Include="dbo\Tables\OpenTickets_Table.sql" />
+    <Build Include="dbo\Tables\OpenTicketTools.sql" />
+    <Build Include="dbo\Tables\PressDowntimeGenerated.sql" />
+    <Build Include="dbo\Tables\ProductColorInfo.sql" />
+    <Build Include="dbo\Tables\ProductMaster.sql" />
+    <Build Include="dbo\Tables\ReadFileS3.sql" />
+    <Build Include="dbo\Tables\ref_api_config.sql" />
+    <Build Include="dbo\Tables\ref_api_config_param.sql" />
+    <Build Include="dbo\Tables\ref_api_config_param_fresh.sql" />
+    <Build Include="dbo\Tables\scheduleCalendar.sql" />
+    <Build Include="dbo\Tables\ScheduleReport.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarCurrent.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarDates.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarPattern.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarSchedule.sql" />
+    <Build Include="dbo\Tables\ShiftCalender.sql" />
+    <Build Include="dbo\Tables\ShiftOverride.sql" />
+    <Build Include="dbo\Tables\ShiftOverrideTimes.sql" />
+    <Build Include="dbo\Tables\StockInventory.sql" />
+    <Build Include="dbo\Tables\StockMaterial.sql" />
+    <Build Include="dbo\Tables\StockMaterialGroup.sql" />
+    <Build Include="dbo\Tables\StockMaterialSubstitute.sql" />
+    <Build Include="dbo\Tables\StockProductMaster.sql" />
+    <Build Include="dbo\Tables\StoredProcActivityLog.sql" />
+    <Build Include="dbo\Tables\StoredProcMaster.sql" />
+    <Build Include="dbo\Tables\TableBatch.sql" />
+    <Build Include="dbo\Tables\TaskActivityLog.sql" />
+    <Build Include="dbo\Tables\TaskBatch.sql" />
+    <Build Include="dbo\Tables\TaskClassificationGroup.sql" />
+    <Build Include="dbo\Tables\TaskMaster.sql" />
+    <Build Include="dbo\Tables\TicketAll.sql" />
+    <Build Include="dbo\Tables\TicketAttribute.sql" />
+    <Build Include="dbo\Tables\TicketAttributeFormula.sql" />
+    <Build Include="dbo\Tables\TicketAttributeValues.sql" />
+    <Build Include="dbo\Tables\TicketDataCache.sql" />
+    <Build Include="dbo\Tables\TicketDataCache_temp.sql" />
+    <Build Include="dbo\Tables\TicketDimensions.sql" />
+    <Build Include="dbo\Tables\TicketItemInfo.sql" />
+    <Build Include="dbo\Tables\TicketMaster.sql" />
+    <Build Include="dbo\Tables\TicketNote.sql" />
+    <Build Include="dbo\Tables\TicketPreProcess.sql" />
+    <Build Include="dbo\Tables\TicketScore.sql" />
+    <Build Include="dbo\Tables\TicketShipping.sql" />
+    <Build Include="dbo\Tables\TicketStock.sql" />
+    <Build Include="dbo\Tables\TicketTask.sql" />
+    <Build Include="dbo\Tables\TicketTool.sql" />
+    <Build Include="dbo\Tables\TimecardInfo.sql" />
+    <Build Include="dbo\Tables\ToolingInventory.sql" />
+    <Build Include="dbo\Tables\UnassignedJobs.sql" />
+    <Build Include="dbo\Types\__ErrorInfoLog.sql" />
+    <Build Include="dbo\Types\udt_equipmentInfo.sql" />
+    <Build Include="dbo\Types\udt_ShipTime_Minutes.sql" />
+    <Build Include="dbo\Types\udt_singleField.sql" />
+    <Build Include="dbo\Types\udt_ticketInfo.sql" />
+    <Build Include="dbo\Types\udt_UnassignedJobs.sql" />
+    <Build Include="dbo\Views\DailyMachineCapacity.sql" />
+    <Build Include="dbo\Views\InfeasibleRoutes.sql" />
+    <Build Include="dbo\Views\MasterScheduleView.sql" />
+    <Build Include="dbo\Views\PressCalendar.sql" />
+    <Build Include="dbo\Views\view_ClientBizCalendar.sql" />
+    <Build Include="dbo\Views\view_masterrollrank.sql" />
+    <Build Include="dbo\Views\view_OrderStatusLatestTaskTimes.sql" />
+    <Build Include="dbo\Views\view_PressDowntimeGenerated.sql" />
+    <Build Include="dbo\Views\view_schedulecalendar.sql" />
+    <Build Include="dbo\Views\view_Shift_MinStart_MaxEnd.sql" />
+    <Build Include="dbo\Views\view_unassignedJobs.sql" />
+    <Build Include="dbo\Types\udt_TicketScore.sql" />
+    <Build Include="dbo\Stored Procedures\spTicketScoreDslValues.sql" />
+    <Build Include="dbo\Stored Procedures\spTicketImportFilterDslValues.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateTicketSchedule.sql" />
+    <Build Include="dbo\Tables\MasterDataType.sql" />
+    <Build Include="dbo\Tables\ConfigurationMaster.sql" />
+    <Build Include="dbo\Tables\ConfigurationValue.sql" />
+    <Build Include="dbo\Stored Procedures\spGetAllEquipmentSchedule.sql" />
+    <Build Include="dbo\Types\udt_TaskAttributes.sql" />
+    <Build Include="dbo\Stored Procedures\spGetShipingScheduleData.sql" />
+    <Build Include="dbo\Stored Procedures\spGetSubstrateReportData.sql" />
+    <Build Include="dbo\Stored Procedures\spGetCoreRequirementReportData.sql" />
+    <Build Include="dbo\Stored Procedures\spGetAllInkRequirement.sql" />
+    <Build Include="dbo\Stored Procedures\spGetAuditLogInfo.sql" />
+    <Build Include="dbo\Tables\AuditMaster.sql" />
+    <Build Include="dbo\Tables\AuditTrail.sql" />
+    <Build Include="dbo\Tables\AuditField.sql" />
+    <Build Include="dbo\Stored Procedures\spGetScheduleReportKPIs.sql" />
+    <Build Include="dbo\Tables\ScheduleRunStatus.sql" />
+    <Build Include="dbo\Stored Procedures\spInitializeScheduleStatus.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateScheduleStatus.sql" />
+    <Build Include="dbo\Tables\TaskInfo.sql" />
+    <Build Include="dbo\Tables\TaskRules.sql" />
+    <Build Include="dbo\Tables\EquipmentShiftCalendar.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarScheduleV1.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarPatternV1.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarDatesV1.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateTicketTaskDslValues.sql" />
+    <Build Include="dbo\Stored Procedures\spUnScheduledTicketsData.sql" />
+    <Build Include="dbo\Types\udt_ScheduleOverride.sql" />
+    <Build Include="dbo\Tables\ScheduleOverride.sql" />
+    <Build Include="dbo\Stored Procedures\spProcessScheduleOverride.sql" />
+    <Build Include="dbo\Stored Procedures\spGetManuallyScheduledTickets.sql" />
+    <Build Include="dbo\Types\udt_ScheduleReportUpdate.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateTicketMovement.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateConstraintTaskDslValues.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateConstraintTaskDslValuesIncr.sql" />
+    <Build Include="dbo\Tables\ChangeoverMinutes_temp.sql" />
+    <Build Include="dbo\Tables\TicketAttributeValues_temp.sql" />
+    <Build Include="dbo\Tables\TicketTask_temp.sql" />
+    <Build Include="dbo\Tables\FeasibleRoutes_temp.sql" />
+    <Build Include="dbo\Tables\UnassignedJobs_temp.sql" />
+    <Build Include="dbo\Stored Procedures\spSinkRulesImports.sql" />
+    <Build Include="dbo\Tables\LagDelayConfig.sql" />
+    <Build Include="dbo\Tables\ReportMaster.sql" />
+    <Build Include="dbo\Tables\FieldMaster.sql" />
+    <Build Include="dbo\Tables\ReportView.sql" />
+    <Build Include="dbo\Tables\ReportViewField.sql" />
+    <Build Include="dbo\Stored Procedures\spGetAllEquipmentSchedule_V2.sql" />
+    <Build Include="dbo\Stored Procedures\spUnScheduledTicketsData_V2.sql" />
+    <Build Include="dbo\Stored Procedures\spGetShipingScheduleData_V2.sql" />
+    <Build Include="dbo\Stored Procedures\spGetAllInkRequirement_V2.sql" />
+    <Build Include="dbo\Types\udt_TicketAttribute.sql" />
+    <Build Include="dbo\Types\udt_TicketAttributeFormula.sql" />
+    <Build Include="dbo\Types\udt_TaskClassificationGroup.sql" />
+    <Build Include="dbo\Types\udt_MasterRollClassificationGroup.sql" />
+    <Build Include="dbo\Types\udt_TimeZone.sql" />
+    <Build Include="dbo\Stored Procedures\spSeedTenantData.sql" />
+    <Build Include="dbo\Stored Procedures\spGetCoreRequirementReportData_V2.sql" />
+    <Build Include="dbo\Stored Procedures\spGetSubstrateReportData_V2.sql" />
+    <Build Include="dbo\Tables\PurchaseOrderMaster.sql" />
+    <None Include="dbo\Stored Procedures\proc_openTicketRoutes.sql" />
+    <Build Include="dbo\Views\LastJobsRun.sql" />
+    <Build Include="dbo\Views\view_equipmentAvailable.sql" />
+    <Build Include="dbo\Views\TicketChangeovers.sql" />
+    <Build Include="dbo\Stored Procedures\generateOpenTicketColors.sql" />
+    <Build Include="dbo\Stored Procedures\proc_OpenTickets_Table.sql" />
+    <Build Include="dbo\Views\view_jobAssignments.sql" />
+    <Build Include="dbo\Indexes\IX_TimecardInfo_EqId_StartedOn.sql" />
+    <Build Include="dbo\Indexes\IX_TimecardInfo_SourceTimecardId.sql" />
+    <Build Include="dbo\Indexes\IX_TicketMaster_SourceTicketId.sql" />
+    <Build Include="dbo\Indexes\IX_EquipmentMaster_SourceEquipmentId.sql" />
+    <Build Include="dbo\Types\udt_singleFieldFilter.sql" />
+    <Build Include="dbo\Stored Procedures\spGetTicketHierarchy.sql" />
+    <Build Include="dbo\Stored Procedures\spGetScheduledTicketTasks.sql" />
+    <Build Include="dbo\Stored Procedures\spGetUnscheduledTicketTasks.sql" />
+    <Build Include="dbo\Tables\CustomerMaster.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateFutureOutlook.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateCriticalJobs.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateScheduleRefreshData.sql" />
+    <Build Include="dbo\Stored Procedures\spCalculateCurrentMachineStatus.sql" />
+    <Build Include="dbo\Views\view_StockSubstitutes.sql" />
+    <Build Include="dbo\Views\CurrentStockLocations.sql" />
+    <Build Include="dbo\Tables\ScheduleArchive.sql" />
+    <Build Include="dbo\Stored Procedures\spArchiveScheduleData.sql" />
+    <Build Include="dbo\Stored Procedures\spPurgeArchivedScheduleData.sql" />
+    <Build Include="dbo\Stored Procedures\spGetTenantConfigValue.sql" />
+    <Build Include="dbo\Tables\ScheduleAnalysis.sql" />
+    <Build Include="dbo\Indexes\IX_ScheduleAnalysis_AnalysisDate.sql" />
+    <Build Include="dbo\Indexes\IX_ScheduleArchive_ArchivedOn.sql" />
+    <Build Include="dbo\Tables\EquipmentScheduleAnalysis.sql" />
+    <Build Include="dbo\Indexes\IX_EquipmentScheduleAnalysis_AnalysisDate.sql" />
+    <Build Include="dbo\Stored Procedures\spAnalyzeSchedule.sql" />
+    <Build Include="dbo\Triggers\TR_ShiftCalendarSchedule_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_EquipmentDowntime_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Tables\EquipmentAudit.sql" />
+    <Build Include="dbo\Triggers\TR_EquipmentMaster_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_ShiftOverride_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Tables\TicketTaskOverride.sql" />
+    <None Include="dbo\Indexes\IX_TicketTaskOverride_SourceTicketId_TaskName.sql" />
+    <Build Include="dbo\Indexes\IX_TicketDimensions_TicketId_CoreSize_NumLeftOverRolls.sql" />
+    <Build Include="dbo\Tables\TicketGeneralNotes.sql" />
+    <Build Include="dbo\Tables\StockAvailabilityConfiguration.sql" />
+    <Build Include="dbo\Tables\DailyEquipmentCapacity.sql" />
+    <None Include="dbo\Indexes\IX_DailyEquipmentCapacity_SourceEquipmentId_Date.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateDailyEquipmentCapacity.sql" />
+    <Build Include="dbo\Indexes\IX_ConfigurationMaster_Id_Name_IsDisabled.sql" />
+    <Build Include="dbo\Tables\UserContext.sql" />
+    <Build Include="dbo\Indexes\IX_UserContext_User_Context.sql" />
+    <None Include="dbo\Indexes\IX_ConfigurationValue_ConfigId.sql" />
+    <Build Include="dbo\Tables\PurchaseOrderItem.sql" />
+    <Build Include="dbo\Tables\TicketStockAvailabilityPO.sql" />
+    <Build Include="dbo\Tables\TicketStockAvailability.sql" />
+    <Build Include="dbo\Tables\TicketStockAvailability_temp.sql" />
+    <Build Include="dbo\Tables\TicketStockAvailabilityPO_temp.sql" />
+    <Build Include="dbo\Indexes\IX_StockInventory_FacilityId_StockMaterialId.sql" />
+    <Build Include="dbo\Stored Procedures\spGetLockedAndOnPressTicketIds.sql" />
+    <Build Include="dbo\Indexes\IX_TicketStock_TicketId.sql" />
+    <None Include="dbo\Stored Procedures\spGetStockMaterialDimensions.sql" />
+    <Build Include="dbo\Tables\ValueStream.sql" />
+    <Build Include="dbo\Tables\EquipmentValueStream.sql" />
+    <Build Include="dbo\Tables\TicketStockAvailabilityRawMaterialTickets.sql" />
+    <Build Include="dbo\Tables\TicketStockAvailabilityRawMaterialTickets_temp.sql" />
+    <Build Include="dbo\Types\udt_FacilityInfo.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateFacilityIdMapping.sql" />
+    <None Include="PostDeploymentScripts\TenantSpecific\bnw-ohio.sql" />
+    <None Include="PostDeploymentScripts\Schema\spCreateUnassignedJobsData_BnW-Ohio.sql" />
+    <Build Include="dbo\Triggers\TR_FacilityHoliday_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_HolidaySchedule_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Tables\TicketTaskData.sql" />
+    <Build Include="dbo\Tables\TicketTaskDependency.sql" />
+    <Build Include="dbo\Tables\StagingRequirementGroup.sql" />
+    <Build Include="dbo\Tables\StagingRequirement.sql" />
+    <Build Include="dbo\Tables\Facility.sql" />
+    <Build Include="dbo\Indexes\IX_TicketStock_TicketId_Sequence_Notes.sql" />
+    <Build Include="dbo\Indexes\IX_TicketTool_TicketId_Sequence_Description.sql" />
+    <Build Include="dbo\Indexes\IX_TicketItemInfo_TicketId_ProductId.sql" />
+    <Build Include="dbo\Stored Procedures\spGetProductionReadyTickets.sql" />
+    <Build Include="dbo\Tables\ScheduleReport_Temp.sql" />
+    <Build Include="dbo\Stored Procedures\spPopulateScheduleReportFromTemp.sql" />
+    <Build Include="dbo\Tables\WorkcenterStockAvailabilityConfiguration.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateTicketTaskStockStatus.sql" />
+    <Build Include="dbo\Types\udt_TaskStockStatus.sql" />
+    <Build Include="dbo\Types\udt_TicketTaskInfo.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarScheduleV2.sql" />
+    <Build Include="dbo\Tables\EquipmentScheduleMapping.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarV2.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarDatesV2.sql" />
+    <Build Include="dbo\Tables\ShiftCalendarPatternV2.sql" />
+    <Build Include="dbo\Triggers\TR_ShiftCalendarScheduleV2_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spGetFirstAvailableTime.sql" />
+    <Build Include="dbo\Triggers\TR_EquipmentScheduleMapping_Insert_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spGetWorkcenterMaterialTicketsStatus.sql" />
+    <Build Include="dbo\Tables\StockInventoryConfiguration.sql" />
+    <Build Include="dbo\Tables\StockInventoryConfigDimensions.sql" />
+    <Build Include="dbo\Tables\StockInventoryConfigFacilities.sql" />
+    <None Include="dbo\Stored Procedures\spGetStockMaterialDimensionsByMaterialId.sql" />
+    <Build Include="dbo\Tables\CapacityConfiguration.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateTaskAndMasterRollClassification.sql" />
+    <Build Include="dbo\Stored Procedures\spGetScheduleManagerData.sql" />
+    <Build Include="dbo\Tables\RulesAudit.sql" />
+    <Build Include="dbo\Triggers\TR_TaskRules_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_TicketAttributeFormula_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_EquipmentConstraint_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_TicketAttribute_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_EquipmentChangeover_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_MasterRollClassificationGroup_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_TaskClassificationGroup_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Triggers\TR_LagDelayConfig_Insert_Update_Delete.sql" />
+    <Build Include="dbo\Tables\LeadTimeExceptions.sql" />
+    <Build Include="dbo\Tables\FeasibleRoutes_Incr.sql" />
+    <Build Include="dbo\Tables\TicketAttributeValues_Incr.sql" />
+    <Build Include="dbo\Tables\TicketTask_Incr.sql" />
+    <Build Include="dbo\Tables\ChangeoverMinutes_Incr.sql" />
+    <None Include="dbo\Stored Procedures\spPerformFeasibleRouteIncrRun.sql" />
+    <None Include="dbo\Stored Procedures\spPerformTicketAttributeValuesIncrRun.sql" />
+    <None Include="dbo\Stored Procedures\spPerformTicketTaskIncrRun.sql" />
+    <None Include="dbo\Stored Procedures\spPerformUnassignedJobsIncrRun.sql" />
+    <None Include="dbo\Stored Procedures\spPerformChangeoverMinutesIncrRun.sql" />
+    <Build Include="dbo\Tables\ReservationRecurrences.sql" />
+    <Build Include="dbo\Tables\Reservations.sql" />
+    <Build Include="dbo\Tables\CustomerReservations.sql" />
+    <Build Include="dbo\Tables\WorkcenterReservations.sql" />
+    <Build Include="dbo\Tables\WorkcenterEquipmentReservations.sql" />
+    <Build Include="dbo\Tables\TicketStockOverrides.sql" />
+    <Build Include="dbo\Tables\ReservationEvents.sql" />
+    <Build Include="dbo\Tables\ReservationTaskAllocation.sql" />
+    <Build Include="dbo\Views\view_StockDimensions.sql" />
+    <None Include="dbo\Stored Procedures\spGetStockMaterialDimensionsForOverrides.sql" />
+    <Build Include="dbo\Tables\ReservationTaskAllocation_temp.sql" />
+    <Build Include="dbo\Tables\ReservedDemand.sql" />
+    <Build Include="dbo\Tables\ReservedDemand_temp.sql" />
+    <Build Include="dbo\Tables\TicketTaskStagingInfo.sql" />
+    <Build Include="dbo\Stored Procedures\spGetStagingRequirementKPI.sql" />
+    <Build Include="dbo\Stored Procedures\spGetOrderStatusDetails.sql" />
+    <Build Include="dbo\Stored Procedures\spGetStagingRequirementsData.sql" />
+    <Build Include="dbo\Stored Procedures\spGetOrderStatusKPI.sql" />
+    <Build Include="dbo\Stored Procedures\spGetOrderStatusFilters.sql" />
+    <Build Include="dbo\Views\view_TicketWorstCaseStatus.sql" />
+    <Build Include="dbo\Views\view_LatestTaskTimes.sql" />
+    <Build Include="dbo\Views\view_OrderStatusTicketDetail.sql" />
+    <Build Include="dbo\Views\view_TicketTaskRaw.sql" />
+    <Build Include="dbo\Stored Procedures\spGetTicketLevelStatuses.sql" />
+    <Build Include="dbo\Stored Procedures\spGenerateCVTicketAttributeCacheValues.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateCVTicketAttributeCachValues.sql" />
+    <Build Include="dbo\Stored Procedures\spGetOpenTicketsLTM.sql" />
+    <Build Include="dbo\Tables\TicketItemColorInfo.sql" />
+    <Build Include="dbo\Views\view_ScheduleReportData.sql" />
+    <Build Include="dbo\Tables\ReportViewRules.sql" />
+    <Build Include="dbo\Tables\EquipmentStockAvailabilityConfiguration.sql" />
+    <Build Include="dbo\Tables\ReportViewPreferences.sql" />
+    <Build Include="dbo\Tables\DowntimeRecurrences.sql" />
+    <Build Include="dbo\Stored Procedures\spGetTicketHierarchyBulk.sql" />
+    <None Include="PostDeploymentScripts\TenantSpecific\bnw-tnmo.sql" />
+    <None Include="PostDeploymentScripts\Schema\BnW-TnMO-ImportPurchaseOrderItem.sql" />
+    <Build Include="dbo\Indexes\IX_ProductMaster_SourceProductId.sql" />
+    <Build Include="dbo\Indexes\IX_StockProductMaster_ProductId_SourceId.sql" />
+    <Build Include="dbo\Indexes\IX_ToolingInventory_SourceToolingId.sql" />
+    <Build Include="dbo\Indexes\IX_StockMaterial_SourceStockId.sql" />
+    <Build Include="dbo\Indexes\IX_PurchaseOrderItem_StockMaterialId.sql" />
+    <Build Include="dbo\Indexes\IX_PurchaseOrderMaster_StockMaterialId.sql" />
+    <Build Include="dbo\Tables\TicketUserDefinedOptions.sql" />
+    <Build Include="dbo\Tables\EquipmentSpeed.sql" />
+    <Build Include="dbo\Indexes\IX_TicketUserDefinedOptions_Ticket_SourceEquipUDID.sql" />
+    <Build Include="dbo\Tables\EquipmentUserDefinedOptions.sql" />
+    <Build Include="dbo\Triggers\TR_ScheduleReport_Insert_Update.sql" />
+    <None Include="PostDeploymentScripts\Data\Calendar.sql" />
+    <None Include="PostDeploymentScripts\Data\MinuteWiseCalendar.sql" />
+    <None Include="PostDeploymentScripts\Schema\2026-02-04_view_OrderStatusLatestTaskTimes.sql" />
+    <Build Include="dbo\Indexes\IX_ProductColorInfo_ProductId.sql" />
+    <None Include="PostDeploymentScripts\Schema\2026-01-30_IX_ProductColorInfo_ProductId.sql" />
+    <None Include="dbo\Scripts\SchemaAlignScriptForTableSwitch.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="PostDeploymentScripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+</Project>

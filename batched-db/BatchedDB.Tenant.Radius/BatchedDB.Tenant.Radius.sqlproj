@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>BatchedDB.Tenant.Radius</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{7e00f449-5ef5-4298-a7bf-739c33a4a5b5}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>BatchedDB.Tenant.Radius</RootNamespace>
+    <AssemblyName>BatchedDB.Tenant.Radius</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Tables" />
+    <Folder Include="dbo\Stored Procedures" />
+    <Folder Include="PostDeploymentScripts" />
+    <Folder Include="PostDeploymentScripts\Schema" />
+    <Folder Include="PostDeploymentScripts\Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\PM_Item.sql" />
+    <Build Include="dbo\Tables\PM_Notes.sql" />
+    <Build Include="dbo\Tables\PM_Plant.sql" />
+    <Build Include="dbo\Tables\PM_User.sql" />
+    <Build Include="dbo\Tables\PV_Address.sql" />
+    <Build Include="dbo\Tables\PV_Class.sql" />
+    <Build Include="dbo\Tables\PV_Customer.sql" />
+    <Build Include="dbo\Tables\PV_Inventory.sql" />
+    <Build Include="dbo\Tables\PV_ItemPacking.sql" />
+    <Build Include="dbo\Tables\PV_Job.sql" />
+    <Build Include="dbo\Tables\PV_JobComponent.sql" />
+    <Build Include="dbo\Tables\PV_JobLine.sql" />
+    <Build Include="dbo\Tables\PV_JobSOLink.sql" />
+    <Build Include="dbo\Tables\PV_JobStep.sql" />
+    <Build Include="dbo\Tables\PV_JobToolSpec.sql" />
+    <Build Include="dbo\Tables\PV_POrder.sql" />
+    <Build Include="dbo\Tables\PV_POrderLine.sql" />
+    <Build Include="dbo\Tables\PV_Req.sql" />
+    <Build Include="dbo\Tables\PV_ShipReq.sql" />
+    <Build Include="dbo\Tables\PV_ShipReqLine.sql" />
+    <Build Include="dbo\Tables\PV_SOrder.sql" />
+    <Build Include="dbo\Tables\PV_SOrderItemType.sql" />
+    <Build Include="dbo\Tables\PV_SOrderLine.sql" />
+    <Build Include="dbo\Tables\PV_Tools.sql" />
+    <Build Include="dbo\Tables\PV_ToolSpec.sql" />
+    <Build Include="dbo\Tables\PV_UDElementData.sql" />
+    <Build Include="dbo\Tables\PV_WareHouse.sql" />
+    <Build Include="dbo\Tables\PV_WorkcConfig.sql" />
+    <Build Include="dbo\Tables\PV_WorkCentre.sql" />
+    <Build Include="dbo\Tables\item-coating.sql" />
+    <Build Include="dbo\Tables\wi-options.sql" />
+    <Build Include="dbo\Tables\wi-profile.sql" />
+    <Build Include="dbo\Tables\wi-roption.sql" />
+    <Build Include="dbo\Tables\wi-rplate.sql" />
+    <Build Include="dbo\Tables\sfeventcds.sql" />
+    <Build Include="dbo\Stored Procedures\spGetRawUserData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportEquipmentData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportProductColorData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportProductData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportPurchaseOrderData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportStockInventoryData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportStockMaterialData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportStockProductData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketDimensionsData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketItemData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketNotesData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketPreProcessData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketScoreData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketShippingData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketStockData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketToolData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTimecardData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportToolData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spRegenerateCustomerPareto_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spRemoveDeletedRecordsData_Radius.sql" />
+    <Build Include="dbo\Tables\wi-pack.sql" />
+    <Build Include="dbo\Stored Procedures\spImportCustomerMasterData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spGetFacilityData_Radius.sql" />
+    <Build Include="dbo\Tables\PV_WorkcConfigOption.sql" />
+    <Build Include="dbo\Tables\PV_ItemApproval.sql" />
+    <Build Include="dbo\Tables\PV_Item_ApprovalLevel.sql" />
+    <Build Include="dbo\Tables\PV_ItemApprovStatus.sql" />
+    <Build Include="dbo\Tables\wi-head.sql" />
+    <Build Include="dbo\Stored Procedures\spImportPurchaseOrderItem_Radius.sql" />
+    <Build Include="dbo\Tables\PV_Supplier.sql" />
+    <Build Include="dbo\Stored Procedures\spImportFacilityData_Radius.sql" />
+    <Build Include="dbo\Tables\sfplan.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketTaskData_Radius.sql" />
+    <Build Include="dbo\Tables\wi-pack-mat.sql" />
+    <None Include="dbo\Stored Procedures\spRegenerateEquipmentCalendar_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketTaskDependencyData_Radius.sql" />
+    <Build Include="dbo\Stored Procedures\spImportTicketItemColorInfo_Radius.sql" />
+    <Build Include="dbo\Tables\WIToolSpec.sql" />
+    <Build Include="dbo\Tables\UserHashValues.sql" />
+    <Build Include="dbo\Tables\PM_User_Temp.sql" />
+    <Build Include="dbo\Stored Procedures\spUpdateUserHashValues.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="PostDeploymentScripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BatchedDB.Tenant\BatchedDB.Tenant.sqlproj">
+      <Name>BatchedDB.Tenant</Name>
+      <Project>{4c023bc7-54e6-42a5-b8c9-756c0dc39c9f}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

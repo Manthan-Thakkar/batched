@@ -1,0 +1,146 @@
+name: Delete LabelTraxx Single Tenant
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_to_environment:
+        type: choice
+        description: choose on which environment want to deploy
+        options:
+        - Development
+        - Production
+      database_name:
+        required: true
+        type: string
+      backup_bucket_name:
+        required: true
+        type: string
+        default: batched-db
+
+permissions:
+  contents: read  # This is required for actions/checkout
+  id-token: write # This is required for requesting the JWT
+  issues: write
+
+jobs:
+  generate-backup:
+    name: Backup Database ${{ github.event.inputs.database_name }}
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: "${{ github.event.inputs.deploy_to_environment == 'Development' && 'batched-dev-runner' || github.event.inputs.deploy_to_environment == 'Production' && 'batched-prod-runner' || 'default-runner' }}"
+    env:
+      DBNAME: ${{ github.event.inputs.database_name }}
+      DB_TSN: ${{ secrets.DB_TSN }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+      - name: Configure AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_LOGIN_ROLE }}
+          role-session-name: GithubActionsRole
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Create database Backup for ${{ github.event.inputs.database_name }}
+        run: |
+          TODAY="$(date +'%d-%m-%Y')"
+          echo TODAY="$TODAY" >> $GITHUB_ENV
+
+          sqlcmd \
+          -S ${{ env.DB_TSN }},1433 \
+          -U ${{ env.DB_USERNAME }} \
+          -P '${{ env.DB_PASSWORD }}' \
+          -h -1 -C \
+          -q "SET NOCOUNT ON; EXEC msdb.dbo.rds_backup_database '$DBNAME', 'arn:aws:s3:::${{ github.event.inputs.backup_bucket_name }}/$TODAY/$DBNAME-${{ github.run_number }}.bak';"
+
+      - name: Poll Backup Status
+        id: backup_status
+        run: |
+          echo "Waiting for RDS snapshot to complete…"
+          # Initial call to get TaskID
+          TaskID=$(sqlcmd \
+                    -S ${{ env.DB_TSN }},1433 \
+                    -U ${{ env.DB_USERNAME }} \
+                    -P '${{ env.DB_PASSWORD }}' \
+                    -h -1 -C \
+                    -q "EXEC msdb.dbo.rds_task_status '$DBNAME';" \
+                    | head -n1 | awk '{print $1}')
+          echo "TaskID: $TaskID"
+
+          # Loop until SUCCESS
+          STATUS=""
+          until [ "$STATUS" = "SUCCESS" ]; do
+            sleep 15
+            STATUS=$(sqlcmd \
+                      -S ${{ env.DB_TSN }},1433 \
+                      -U ${{ env.DB_USERNAME }} \
+                      -P '${{ env.DB_PASSWORD }}' \
+                      -h -1 -C \
+                      -q "EXEC msdb.dbo.rds_task_status '$DBNAME',$TaskID;" \
+                      | head -n1 | awk '{print $6}')
+            echo "Current status: $STATUS"
+
+            if [ "$STATUS" = "ERROR" ]; then
+              echo "❌ Task $TaskID failed with status: $STATUS"
+              exit 1
+            fi
+          done
+
+          echo "Backup completed successfully."
+  manual-approval:
+    needs: generate-backup
+    name: Manual Approval for Database ${{ github.event.inputs.database_name }}
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Approval for deletion of ${{ inputs.database_name }} on ${{ inputs.deploy_to_environment }}
+        uses: trstringer/manual-approval@v1
+        timeout-minutes: 10
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: nmulani-amtech,shekhar-amtech,manthan-amtech
+          minimum-approvals: 1
+          issue-title: "Do you want to proceed with deletion of ${{ inputs.database_name }}? started by ${{ github.actor }}"
+          issue-body: "Please approve or deny"
+          exclude-workflow-initiator-as-approver: false
+          additional-approved-words: ''
+          additional-denied-words: ''
+  delete-db:
+    needs: manual-approval
+    name: Delete Database ${{ github.event.inputs.database_name }}
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: "${{ github.event.inputs.deploy_to_environment == 'Development' && 'batched-dev-runner' || github.event.inputs.deploy_to_environment == 'Production' && 'batched-prod-runner' || 'default-runner' }}"
+    env:
+      DBNAME: ${{ github.event.inputs.database_name }}
+      DB_TSN: ${{ secrets.DB_TSN }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Delete database - ${{ github.event.inputs.database_name }}
+        run: |
+          database_exists=$(sqlcmd -S ${{ env.DB_TSN }},1433 -U ${{ env.DB_USERNAME }} -P '${{ env.DB_PASSWORD }}' -C -Q "IF DB_ID('$DBNAME') IS NOT NULL SELECT 1 ELSE SELECT 0" | grep -o '[0-9]' | head -n 1)
+          if [ "$database_exists" -eq 1 ]; then
+              sqlcmd -S ${{ env.DB_TSN }},1433 -U ${{ env.DB_USERNAME }} -P '${{ env.DB_PASSWORD }}' -C -Q "DROP DATABASE [$DBNAME];"
+              sleep 10
+              database_exists=$(sqlcmd -S ${{ env.DB_TSN }} -U ${{ env.DB_USERNAME }} -P '${{ env.DB_PASSWORD }}' -C -Q "IF DB_ID('$DBNAME') IS NOT NULL SELECT 1 ELSE SELECT 0" | grep -o '[0-9]' | head -n 1)
+              if [ "$database_exists" -eq 0 ]; then
+                  echo "Database successfully dropped."
+              else
+                  echo "Database could not be dropped."
+                  exit 1
+              fi
+          else
+              echo "Database does not exist."
+          fi
+      - name: Post Delete database Script Execution for ${{ github.event.inputs.database_name }}
+        run: sqlcmd -S ${{ env.DB_TSN }},1433 -U ${{ env.DB_USERNAME }} -P '${{ env.DB_PASSWORD }}' -C -i scripts/post-deletion-cleanup-script.sql -v DbName_value=$DBNAME
+
+      - name: Deletion Summary
+        run: |
+          echo "## 🗑️ Database Deletion Information - Environment: **${{ github.event.inputs.deploy_to_environment }}**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow:** Delete LabelTraxx Single Tenant" >> $GITHUB_STEP_SUMMARY
+          echo "- **Database:** ${{ github.event.inputs.database_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deletion Status:** ✅ Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backup Bucket:** ${{ github.event.inputs.backup_bucket_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered By:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

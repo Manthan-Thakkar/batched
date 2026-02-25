@@ -1,0 +1,58 @@
+name: Batched DB Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_to_environment:
+        type: choice
+        description: choose on which environment want to deploy
+        options:
+        - Development
+        - Production
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  build:
+    name: Deploying Batched DB
+    environment: ${{ github.event.inputs.deploy_to_environment }}
+    runs-on: "${{ github.event.inputs.deploy_to_environment == 'Development' && 'batched-dev-runner' || github.event.inputs.deploy_to_environment == 'Production' && 'batched-prod-runner' || 'default-runner' }}"
+    defaults:
+      run:
+        working-directory: ./BatchedDB.Configuration/MigrationBasedBuild
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - uses: actions/setup-dotnet@v5
+      env:
+        DOTNET_INSTALL_DIR: ${{ github.workspace }}/.dotnet
+      with:
+        dotnet-version: '8'
+
+    - name: Build Project
+      run: dotnet build
+
+    - name: Publish Package
+      run:  |
+          export PATH="$HOME/.dotnet/tools:$PATH"
+          sqlpackage /Action:Publish \
+          /SourceFile:./bin/Debug/netstandard2.0/model-Batched.dacpac \
+          /TargetServerName:${{ secrets.DB_TSN }},1433 \
+          /TargetDatabaseName:batched \
+          /TargetUser:${{ secrets.DB_USERNAME }} \
+          /TargetPassword:'${{ secrets.DB_PASSWORD }}' \
+          /DeployScriptPath:"./Result-${{ github.run_number }}.txt" \
+          /p:TreatVerificationErrorsAsWarnings=True \
+          /p:BlockOnPossibleDataLoss=True
+
+    - name: Deployment Summary
+      run: |
+        echo "## 🚀 Deployment Information - Environment: **${{ github.event.inputs.deploy_to_environment }}**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow:** Batched DB Deploy" >> $GITHUB_STEP_SUMMARY
+        echo "- **Database:** batched" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered By:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

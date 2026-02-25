@@ -1,0 +1,8 @@
+﻿ CREATE TABLE [dbo].[PM_User_Temp] (
+	[UserCode] NVARCHAR(4000) NULL,
+	[UserName] NVARCHAR(4000) NULL,
+	[Email] NVARCHAR(4000) NULL,
+	[OfficePhone] NVARCHAR(4000) NULL,
+	[TableRecId] BIGINT NULL,
+	[HashValue] VARBINARY(32) NULL
+);

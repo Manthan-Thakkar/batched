@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Autofac" Version="6.3.0" />
+		<PackageReference Include="Batched.Audit.Sdk" Version="2.0.2" />
+		<PackageReference Include="Batched.Common" Version="3.0.4" />
+		<PackageReference Include="Batched.Common.Auth" Version="3.0.1" />
+		<PackageReference Include="Batched.Common.Aws.Parameters" Version="3.0.0" />
+		<PackageReference Include="Batched.Common.Cache.Redis" Version="3.0.0" />
+		<PackageReference Include="Batched.Common.Data.Sql" Version="3.0.2" />
+		<PackageReference Include="Batched.Common.Data.Tenants.Sql" Version="3.0.4" />
+		<PackageReference Include="Batched.Common.Export" Version="2.0.6" />
+		<PackageReference Include="Batched.Common.Serilog" Version="3.0.1" />
+		<PackageReference Include="Batched.DBInstanceService.Sdk" Version="3.0.0" />
+		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="TimeZoneConverter" Version="6.1.0" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+[
+  {
+    "FieldName": "name",
+    "DisplayName": "Exception Name"
+  },
+  {
+    "FieldName": "leadTimeInDays",
+    "DisplayName": "Lead Time (Days)"
+  },
+  {
+    "FieldName": "reason",
+    "DisplayName": "Reason"
+  },
+  {
+    "FieldName": "reportedBy",
+    "DisplayName": "Reported By"
+  }
+]

@@ -1,0 +1,208 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: RDS MSSQL Secret Rotation with two Lambda functions (rotate and finish)
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 120
+    MemorySize: 512
+    Architectures: [arm64]
+    Environment:
+      Variables:
+        LOG_LEVEL: INFO
+
+Resources:
+  # SNS Topic for health check notifications
+  HealthCheckNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: secret-rotation-health-check-notifications
+      DisplayName: "Secret Rotation Health Check Notifications"
+      KmsMasterKeyId: alias/aws/sns
+
+  # SQS Queue for parameter updates
+  ParameterUpdateQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: parameter-update-queue
+      VisibilityTimeout: 900  # 15 minutes
+      MessageRetentionPeriod: 1209600  # 14 days
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ParameterUpdateDeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  ParameterUpdateDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: parameter-update-dlq
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  RotateMasterPassword:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: RotateMasterPassword
+      CodeUri: src/rotate-master-password/
+      Handler: app.lambda_handler
+      Description: Rotate MSSQL master password and manage rotation steps
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+                - secretsmanager:PutSecretValue
+                - secretsmanager:DescribeSecret
+                - secretsmanager:UpdateSecretVersionStage
+                - secretsmanager:ListSecretVersionIds
+                - secretsmanager:GetRandomPassword
+              Resource: "*"  # TODO: scope to specific secret ARNs
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"  # TODO: scope to DB resource
+            - Effect: Allow
+              Action:
+                - sqs:SendMessage
+              Resource: !GetAtt ParameterUpdateQueue.Arn
+            - Effect: Allow
+              Action:
+                - lambda:UpdateFunctionConfiguration
+                - lambda:GetFunction
+                - lambda:ListFunctions
+              Resource: "*"  # TODO: scope to specific .NET Lambda ARNs
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds3}}'
+      Environment:
+        Variables:
+          PARAMETER_UPDATE_QUEUE_URL: !Ref ParameterUpdateQueue
+          PARAMETER_NAMES: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/parameter-names}}'  # TODO: Update with actual parameter names
+          REDIS_ENDPOINT: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/redis_host}}'  # TODO: Add Redis endpoint to SSM
+          REDIS_PORT: '6379'
+  RotationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref RotateMasterPassword
+      Action: lambda:InvokeFunction
+      Principal: secretsmanager.amazonaws.com
+      SourceArn: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*
+  FinishSecretUpdateParams:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: FinishSecretUpdateParams
+      CodeUri: src/finish-secret-update-params/
+      Handler: app.lambda_handler
+      Description: Update parameter values triggered by SQS messages, perform health checks, and manage post-update tasks
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds3}}'
+      Environment:
+        Variables:
+          REDIS_ENDPOINT: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/redis_host}}'
+          REDIS_PORT: '6379'
+          HEALTH_CHECK_FUNCTION_NAME: !Ref HealthCheckFunction
+          GITHUB_APP_ID: '1203639'
+          GITHUB_INSTALLATION_ID: '63887341'
+          GITHUB_REPO_OWNER: 'LabelTraxx'
+          GITHUB_REPO_NAME: 'batched-db'
+          GITHUB_ENVIRONMENT_NAME: '{{resolve:ssm:/batched-secret-rotation-lambda-envs/environment}}'
+          GITHUB_SECRET_NAME: 'DB_PASSWORD'
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambdaSQSQueueExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:PutParameter
+                - ssm:GetParameter
+                - ssm:AddTagsToResource
+              Resource: "*"  # TODO: scope to parameter ARNs
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: 
+                - !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/secret-rotation/github/*'
+            - Effect: Allow
+              Action:
+                - lambda:UpdateFunctionConfiguration
+                - lambda:GetFunction
+                - lambda:ListFunctions
+              Resource: "*"  # TODO: scope to specific .NET Lambda ARNs
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: !GetAtt HealthCheckFunction.Arn
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ParameterUpdateQueue.Arn
+            BatchSize: 1
+
+  HealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: SecretRotationHealthCheck
+      CodeUri: src/health-check/
+      Handler: app.lambda_handler
+      Description: Comprehensive health check with retry logic and SNS notifications
+      Timeout: 300  # 5 minutes for multiple health checks with retries
+      MemorySize: 256
+      Environment:
+        Variables:
+          HEALTH_CHECK_SNS_TOPIC: !Ref HealthCheckNotificationTopic
+          HEALTH_CHECK_CONFIG_PARAMETER: '/secret-rotation/health-check-config'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-secret-rotation-lambda-envs/SubnetIds3}}'
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - sns:Publish
+              Resource: !Ref HealthCheckNotificationTopic
+            - Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: !Sub 'arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/secret-rotation/*'
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: '*'  # Allow invoking any Lambda function for health checks
+
+Outputs:
+  RotateMasterPasswordArn:
+    Value:
+      Fn::GetAtt: [RotateMasterPassword, Arn]
+  FinishSecretUpdateParamsArn:
+    Value:
+      Fn::GetAtt: [FinishSecretUpdateParams, Arn]
+  HealthCheckFunctionArn:
+    Value:
+      Fn::GetAtt: [HealthCheckFunction, Arn]
+    Description: ARN of the health check Lambda function
+  ParameterUpdateQueueUrl:
+    Value: !Ref ParameterUpdateQueue
+    Description: SQS Queue URL for parameter updates
+  ParameterUpdateQueueArn:
+    Value: !GetAtt ParameterUpdateQueue.Arn
+    Description: SQS Queue ARN for parameter updates
+  HealthCheckNotificationTopicArn:
+    Value: !Ref HealthCheckNotificationTopic
+    Description: SNS Topic ARN for health check failure notifications

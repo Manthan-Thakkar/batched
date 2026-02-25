@@ -1,0 +1,2 @@
+﻿CREATE INDEX [IX_DailyEquipmentCapacity_SourceEquipmentId_Date]
+	ON DailyEquipmentCapacity(SourceEquipmentId, Date)

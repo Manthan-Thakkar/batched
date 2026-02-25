@@ -1,0 +1,215 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  batched-manual-snapshot-lambda
+  Sample SAM Template for batched-manual-snapshot-lambda
+Resources:
+  WeeklyManualRDSBackupFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+    Properties:
+      FunctionName: Weekly-RDS-Manual-Backup-Scheduler
+      CodeUri: functions/weekly_manual_rds_snapshot/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          teams_sns_topic_arn: '{{resolve:ssm:/batched-db-backup-service-envs/teams_sns_topic_arn}}'
+          environment: '{{resolve:ssm:/batched-db-backup-service-envs/environment}}'
+      Events:
+        CWSchedule:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: 'cron(0 0 ? * SUN *)'
+            Name: Weekly-RDS-Manual-BackupSchedule
+            Input: '{"rds_db_name": "{{resolve:ssm:/batched-db-backup-service-envs/rds_db_identifier_name}}"}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "rds:CreateDBSnapshot"
+          - "rds:AddTagsToResource"
+          - "rds:DescribeDBSnapshots"
+          - "rds:DeleteDBSnapshot"
+          - "SNS:Publish"
+          Resource:
+          - "*"
+
+  BackupSchedulerFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+    Properties:
+      FunctionName: Manual-DB-Backup-Scheduler
+      CodeUri: functions/backup_scheduler/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Environment:
+        Variables:
+          target_state_machine_arn: !GetAtt ManualPerTenantDBBackupStateMachine.Arn
+          start_execution_target_state_machine_role_arn: !GetAtt EventBridgeInvokeStepFunctionRole.Arn
+          schedule_group_name: !Ref MyScheduleGroup
+          rds_secret_name: '{{resolve:ssm:/batched-db-backup-service-envs/rds_secret_name}}'
+          teams_sns_topic_arn: '{{resolve:ssm:/batched-db-backup-service-envs/teams_sns_topic_arn}}'
+      Events:
+        CWSchedule:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: 'cron(0 0 * * ? *)'
+            Name: ManualDBBackupScheduler
+      Layers:
+        - '{{resolve:ssm:/batched-db-backup-service-envs/PyODBC-Layer-Arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "iam:PassRole"
+          - "secretsmanager:GetSecretValue"
+          - "scheduler:CreateSchedule"
+          - "SNS:Publish"
+          Resource:
+          - "*"
+
+  EventBridgeInvokeStepFunctionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'scheduler.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'InvokeStepFunctionPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'states:StartExecution'
+                Resource: !GetAtt ManualPerTenantDBBackupStateMachine.Arn
+
+  # Schedule Group
+  MyScheduleGroup:
+    Type: 'AWS::Scheduler::ScheduleGroup'
+    Properties:
+      Name: 'RDS-Manual-Backup-Scheduler-Group'
+
+  ManualPerTenantDBBackupStateMachine:
+    Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+    Properties:
+      Name: Manual-PerTenant-DB-Backup-State-Machine
+      DefinitionUri: statemachine/manual_backup.asl.json
+      DefinitionSubstitutions:
+        CreateDBBackupTaskFunctionArn: !GetAtt CreateDBBackupTaskFunction.Arn
+        CheckStatusDBBackupFunctionArn: !GetAtt CheckStatusDBBackupFunction.Arn
+        NotifyStatusFunctionArn: !GetAtt NotifyStatusFunction.Arn
+      Policies: # Find out more about SAM policy templates: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+      - LambdaInvokePolicy:
+          FunctionName: !Ref CreateDBBackupTaskFunction
+      - LambdaInvokePolicy:
+          FunctionName: !Ref CheckStatusDBBackupFunction
+      - LambdaInvokePolicy:
+          FunctionName: !Ref NotifyStatusFunction
+
+  CreateDBBackupTaskFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+    Properties:
+      FunctionName: Create-DB-Backup-Task
+      CodeUri: functions/create_db_backup/
+      Handler: app.create_DB_Backup
+      Runtime: python3.12
+      Environment:
+        Variables:
+          rds_secret_name: '{{resolve:ssm:/batched-db-backup-service-envs/rds_secret_name}}'
+          storage_bucket_name: '{{resolve:ssm:/batched-db-backup-service-envs/storage_bucket_name}}'
+      Layers:
+        - '{{resolve:ssm:/batched-db-backup-service-envs/PyODBC-Layer-Arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          Resource:
+          - "*"
+
+  CheckStatusDBBackupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: Check-DB-Task-Status
+      CodeUri: functions/status_check_db_backup/
+      Handler: app.check_DB_Backup_Status
+      Runtime: python3.12
+      Environment:
+        Variables:
+          rds_secret_name: '{{resolve:ssm:/batched-db-backup-service-envs/rds_secret_name}}'
+      Layers:
+        - '{{resolve:ssm:/batched-db-backup-service-envs/PyODBC-Layer-Arn}}'
+      VpcConfig:
+        SecurityGroupIds:
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SecurityGroupId}}'
+        SubnetIds:
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds1}}'
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds2}}'
+          - '{{resolve:ssm:/batched-db-backup-service-envs/SubnetIds3}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "secretsmanager:GetSecretValue"
+          Resource:
+          - "*"
+
+  NotifyStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: Notify-Task-Status
+      CodeUri: functions/status_notify_db_backup/
+      Handler: app.notifyStatus
+      Runtime: python3.12
+      Environment:
+        Variables:
+          sns_topic_arn: '{{resolve:ssm:/batched-db-backup-service-envs/sns_topic_arn}}'
+          teams_sns_topic_arn: '{{resolve:ssm:/batched-db-backup-service-envs/teams_sns_topic_arn}}'
+          environment: '{{resolve:ssm:/batched-db-backup-service-envs/environment}}'
+      Policies:
+      - Statement:
+        - Effect: Allow
+          Action:
+          - "s3:*"
+          - "SNS:Publish"
+          Resource:
+          - "*"
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    LoggingConfig:
+      LogFormat: JSON
+    Timeout: 600
+    Architectures: [arm64]

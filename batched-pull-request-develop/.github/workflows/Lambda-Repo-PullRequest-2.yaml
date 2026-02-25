@@ -1,0 +1,91 @@
+name: Create Release PR Lambda Applications 2
+permissions:
+  contents: read
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Enter release fix version (e.g. "BD_2023.05.10.0")'
+        required: true
+      branch_type:
+        description: 'Select the type of branch'
+        required: true
+        type: choice
+        options:
+          - release
+          - hotfix
+      batched-audit-service:
+        required: true
+        type: boolean
+      batched-archival:
+        required: true
+        type: boolean
+      batched-export-lambda:
+        required: true
+        type: boolean
+      batched-log-forwarder-service:
+        required: true
+        type: boolean
+      batched-airflow-db-provisioning:
+        required: true
+        type: boolean
+      batched-workflow-status-healthcheck:
+        required: true
+        type: boolean
+      # batched-s3tords-trigger:
+      #   required: true
+      #   type: boolean
+
+jobs:
+  parse-selected:
+    runs-on: ubuntu-latest
+    outputs:
+      selected: ${{ steps.parse-selected-step.outputs.selected }}
+    steps:
+      - id: parse-selected-step
+        uses: joao-zanutto/get-selected@v1.1.1
+        with:
+          format: json
+
+  create-pr:
+    needs: parse-selected
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        value: ${{ fromJSON(needs.parse-selected.outputs.selected) }}
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ matrix.value }}
+      - name: Checkout tools repo
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ matrix.value }}
+          ref: develop
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Create Branch and Tag
+        run: |
+          git tag ${{ inputs.release_name }} ${{ steps.checkout.outputs.commit }}
+          git checkout -b ${{ inputs.branch_type }}/${{ inputs.release_name }} ${{ steps.checkout.outputs.commit }}
+          git push origin ${{ inputs.branch_type }}/${{ inputs.release_name }} --tags
+      - name: Create Pull Request
+        id: create-pr
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/{owner}/{repo}/pulls
+          owner: ${{ github.repository_owner }}
+          repo: ${{ matrix.value }}
+          title: 'Release - ${{ inputs.branch_type }}/${{ inputs.release_name }}'
+          head: '${{ inputs.branch_type }}/${{ inputs.release_name }}'
+          base: 'master'
+          body: 'Pull Request for Release - ${{ github.event.inputs.new_branch }} on Base Branch Master'
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Share Output
+        run: echo "${{ matrix.value }} - ${{ fromJson(steps.create-pr.outputs.data).html_url }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+
+    stages {		 
+     			
+        stage('Check Sprint Tag') {
+            steps {
+                script {
+                    if (params.SPRINT_NAME == null || params.SPRINT_NAME.trim() == '') {
+                        error("Parameter 'SPRINT_NAME' cannot be empty!")
+                    }
+                }
+            }
+        }
+        stage('Pull Request') {
+        steps {
+
+             withCredentials([usernamePassword(credentialsId: 'Jenkins-Bitbucket', passwordVariable: 'BITBUCKET_PASSWORD', usernameVariable: 'BITBUCKET_USERNAME')]){
+              sh ''' #!/bin/bash
+                echo $SPRINT_NAME
+                echo $REPOSITORIES > repos
+                tr ',' '\n' < repos > repo-list
+                cat repo-list
+
+                while read REPOSITORY; do 
+
+                latest_commit=$(git ls-remote https://${BITBUCKET_USERNAME}:${BITBUCKET_PASSWORD}@bitbucket.org/batched/$REPOSITORY.git develop | awk '{ print $1 }' | head -n 1)
+                git clone https://${BITBUCKET_USERNAME}:${BITBUCKET_PASSWORD}@bitbucket.org/batched/$REPOSITORY.git
+                cd $REPOSITORY/
+                git tag "$SPRINT_NAME" $latest_commit
+                release_branch="$RELEASE_BRANCH/$(date +%Y%m%d)"
+                git checkout -b $release_branch $latest_commit
+                git push origin $release_branch --tags
+                aws ssm get-parameter --name  "Access-Token" --with-decryption --output text --query "Parameter.Value" > access-tokens
+                ACCESS_TOKEN=$(cat access-tokens | grep $REPOSITORY | cut -d "=" -f 2,3)
+                curl --request POST --url "https://api.bitbucket.org/2.0/repositories/Batched/${REPOSITORY}/pullrequests" --header "Authorization: Bearer ${ACCESS_TOKEN}" --header 'Accept: application/json' --header 'Content-Type: application/json' --data '{
+                      "title": "'"${release_branch}"'",
+                      "source": {
+                        "branch": {
+                          "name": "'"${release_branch}"'"
+                        }
+                      },
+                      "destination": {
+                        "branch": {
+                          "name": "master"
+                        }
+                      }
+                    }' 
+                
+                done < repo-list
+
+              '''
+            }
+            
+          }
+
+          }
+        stage('PR-List') {
+        steps {
+          script { 
+            withCredentials([usernamePassword(credentialsId: 'Jenkins-Bitbucket', passwordVariable: 'BITBUCKET_PASSWORD', usernameVariable: 'BITBUCKET_USERNAME')]){
+              sh ''' #!/bin/bash
+                echo $REPOSITORIES > repos
+                tr ',' '\n' < repos > repo-list
+                cat repo-list
+
+                while read REPOSITORY; do 
+
+                aws ssm get-parameter --name  "Access-Token" --with-decryption --output text --query "Parameter.Value" > access-tokens
+                release_branch="$RELEASE_BRANCH/$(date +%Y%m%d)"
+                ACCESS_TOKEN=$(cat access-tokens | grep $REPOSITORY | cut -d "=" -f 2,3)
+                curl --request GET --url "https://api.bitbucket.org/2.0/repositories/Batched/${REPOSITORY}/pullrequests" --header "Authorization: Bearer ${ACCESS_TOKEN}" --header 'Accept: application/json' > pull-request.json
+                jq '.values[] |select(.source.branch.name == "'"${release_branch}"'") |select(.destination.branch.name == "master") | .links.html.href' pull-request.json >> PR-list
+                done < repo-list
+
+                cat PR-list
+              '''
+            }
+
+          }
+        }
+      }
+      }
+    
+    post {
+      always {
+        deleteDir() // clean up our workspace
+      }
+    }
+      }

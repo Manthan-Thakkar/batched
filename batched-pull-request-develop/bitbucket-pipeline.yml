@@ -1,0 +1,15 @@
+definitions:
+ steps:
+    - step: &findip
+        name: Findip
+        image: public.ecr.aws/a1q8l8p3/bitbucket-pipeline:v2
+        script:
+         - curl https://ipinfo.io/ip
+
+
+options:
+  max-time: 15
+
+pipelines:
+  default:
+    - step: *findip
